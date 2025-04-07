@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Goals Board</title>
+    <link rel="stylesheet" href="style.css"> 
+    <style>
+        main{margin-top: 200px;}
+        footer{border: 0px;}
+    </style>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+</head>
+<body>
+    <main>
+        <section id="kanban-page" class="page active">
+            <section id="kanban-board">
+                <div class="kanban-column" id="todo-column" data-status="todo">
+                    <h2>To Do</h2>
+                    <div class="kanban-cards" id="todo-cards"></div>
+                </div>
+                <div class="kanban-column" id="inprogress-column" data-status="inprogress">
+                    <h2>In Progress</h2>
+                    <div class="kanban-cards" id="inprogress-cards"></div>
+                </div>
+                <div class="kanban-column" id="done-column" data-status="done">
+                    <h2>Done</h2>
+                    <div class="kanban-cards" id="done-cards"></div>
+                </div>
+            </section>
+
+        </section>
+    </main>
+
+    <!-- == MODAL STRUCTURE (Initially Hidden) == -->
+    <div id="goal-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3 id="modal-title">Goal Details</h3>
+            <form id="modal-goal-form">
+                <input type="hidden" id="modal-goal-id"> <!-- To store ID when editing -->
+                 <input type="hidden" id="modal-goal-status"> <!-- To store target status when adding -->
+                <div>
+                    <label for="modal-goal-title">Title:</label>
+                    <input type="text" id="modal-goal-title" required>
+                </div>
+                <div>
+                    <label for="modal-goal-description">Description:</label>
+                    <textarea id="modal-goal-description"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" id="save-goal-button">Save Goal</button>
+                    <button type="button" id="cancel-goal-button">Cancel</button>
+                </div>
+            </form>
+            <button class="modal-close-btn" id="modal-close-button" title="Close">×</button>
+        </div>
+    </div>
+    <!-- == END MODAL STRUCTURE == -->
+
+
+    <footer>
+        <nav>
+            <a href="../index.html" class="nav-link">Back to Tracker</a>
+        </nav>
+    </footer>
+
+    <script src="kanban.js"></script>
+
+</body>
+</html>

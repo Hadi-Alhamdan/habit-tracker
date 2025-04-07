@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Habit & Task Tracker</title>
+    <link rel="stylesheet" href="files/style.css" />
+    <!-- Basic Favicon -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>"
+    />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <button data-page="daily-log" class="active">Daily Log</button>
+        <button data-page="stats">Stats</button>
+        <a href="files/kanban.html" class="nav-link">Goals Board</a>
+        <button data-page="edit-items">Edit Habits</button>
+        <button data-page="data-management">Manage Data</button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- ======================= -->
+      <!--    DAILY LOG PAGE       -->
+      <!-- ======================= -->
+      <section id="daily-log-page" class="page active">
+        <h2>Daily Log</h2>
+
+        <!-- Date Selector -->
+        <div class="date-selector">
+          <!-- Keep this simple, styling might be needed -->
+          <label for="log-date">Select Date:</label>
+          <input type="date" id="log-date" />
+        </div>
+        <hr />
+
+        <!-- Container for dynamically loaded content -->
+        <div id="daily-log-content">
+          <!-- JS will populate this section based on the selected date -->
+          <p>Loading data...</p>
+        </div>
+
+        <hr />
+
+        <!-- Save Button & Score Display -->
+        <div class="daily-log-footer">
+          <button id="save-daily-log">Save Day's Progress</button>
+          <div id="daily-score-display">
+            <h3>Final Day Score: <span id="final-score-value">--</span></h3>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================= -->
+      <!--      STATS PAGE         -->
+      <!-- ======================= -->
+      <section id="stats-page" class="page">
+        <h2>Statistics</h2>
+        <!-- == NEW: Date Range Selector == -->
+        <div id="stats-range-selector">
+          <div class="stats-range-presets">
+            <span>Range:</span>
+            <button data-range="7d">7 Days</button>
+            <button data-range="30d" class="active">30 Days</button>
+            <!-- Default active -->
+            <button data-range="90d">90 Days</button>
+            <button data-range="365d">1 Year</button>
+            <button data-range="custom-toggle">Custom</button>
+          </div>
+          <div class="stats-range-custom" style="display: none">
+            <!-- Initially hidden -->
+            <label for="stats-start-date">Start:</label>
+            <input type="date" id="stats-start-date" />
+            <label for="stats-end-date">End:</label>
+            <input type="date" id="stats-end-date" />
+            <button id="stats-apply-custom-range">Apply</button>
+          </div>
+        </div>
+        <!-- == END: Date Range Selector == -->
+        <!-- Overall Streak Display -->
+        <div class="streak-display">
+          <h3>
+            Overall Streak : <span id="overall-streak-value">0</span> days
+          </h3>
+        </div>
+        <hr class="stats-divider" />
+        <!-- Optional divider -->
+
+        <!-- Overall Score Chart -->
+        <div class="chart-container">
+          <h3 id="daily-score-chart-title">Daily Score (Last 30 Days)</h3>
+          <!-- Title ID added -->
+          <canvas
+            id="daily-score-chart"
+            role="img"
+            aria-label="Line chart showing daily scores"
+          ></canvas>
+        </div>
+
+        <!-- Individual Habit Stats -->
+        <div class="habit-stats-container">
+          <!-- Div wrapper for title/select for better layout control -->
+          <div>
+            <select id="habit-stats-selector">
+              <option value="">-- Select Habit --</option>
+              <!-- Options populated by JS -->
+            </select>
+          </div>
+          <div class="chart-container">
+            <canvas
+              id="single-habit-chart"
+              role="img"
+              aria-label="Line chart showing completion status for the selected habit"
+            ></canvas>
+          </div>
+          <p>
+            Current Streak for Selected Habit:
+            <span id="habit-streak-value">--</span>
+          </p>
+        </div>
+      </section>
+
+      <!-- ======================= -->
+      <!--   EDIT HABITS PAGE      -->
+      <!-- ======================= -->
+      <section id="edit-items-page" class="page">
+        <h2>Edit Habits</h2>
+
+        <div class="edit-section">
+          <h3>Add New Habit</h3>
+          <form id="add-habit-form">
+            <div>
+              <label for="new-habit-name">Habit Name:</label>
+              <input
+                type="text"
+                id="new-habit-name"
+                placeholder="e.g., Morning Exercise"
+                required
+              />
+            </div>
+            <div>
+              <label for="new-habit-weight"
+                >Weight (Contribution to Routine Score):</label
+              >
+              <input
+                type="number"
+                id="new-habit-weight"
+                placeholder="e.g., 20"
+                required
+                min="0"
+                step="any"
+              />
+            </div>
+            <div>
+              <label for="new-habit-desc">Description (Optional):</label>
+              <textarea
+                id="new-habit-desc"
+                placeholder="e.g., 30 minutes cardio"
+              ></textarea>
+            </div>
+            <button type="submit">Add Habit</button>
+          </form>
+        </div>
+
+        <hr />
+
+        <div class="edit-section">
+          <h3>Existing Habits</h3>
+          <ul id="habits-list">
+            <li>Loading habits...</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ======================= -->
+      <!-- DATA MANAGEMENT PAGE    -->
+      <!-- ======================= -->
+      <section id="data-management-page" class="page">
+        <h2>Data Management</h2>
+
+        <div class="data-action">
+          <h3>Export Data</h3>
+          <p>Download all your habit tracking data as a JSON file.</p>
+          <button id="export-data">Export Data</button>
+        </div>
+        <hr />
+
+        <div class="data-action">
+          <h3>Import Data</h3>
+          <p>
+            Replace all current data with data from a previously exported JSON
+            file.
+            <strong style="color: orange"
+              >Warning: This overwrites everything!</strong
+            >
+          </p>
+          <label for="import-file">Select JSON File:</label>
+          <input type="file" id="import-file" accept=".json,application/json" />
+          <button id="import-data">Import</button>
+        </div>
+        <hr />
+
+        <div class="data-action">
+          <h3 style="color: red">Delete All Data</h3>
+          <p>
+            Permanently remove all habits, logs, and settings.
+            <strong style="color: red">This action cannot be undone!</strong>
+          </p>
+          <button id="delete-all-data" class="danger">
+            Delete All My Data
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <footer></footer>
+
+    <!-- JavaScript Files -->
+    <script src="node_modules/chart.js/dist/chart.umd.js"></script>
+    <script src="files/app.js"></script>
+  </body>
+</html>
