@@ -18,22 +18,42 @@ document.addEventListener("DOMContentLoaded", () => {
   // Edit Habits Elements
   const addHabitForm = document.getElementById("add-habit-form");
   const habitsList = document.getElementById("habits-list");
+  const editHabitModal = document.getElementById("edit-habit-modal");
+  const editHabitForm = document.getElementById("edit-habit-modal-form");
+  const editHabitIdInput = document.getElementById("edit-habit-id");
+  const editHabitNameInput = document.getElementById("edit-habit-name");
+  const editHabitWeightInput = document.getElementById("edit-habit-weight");
+  const editHabitDescInput = document.getElementById("edit-habit-desc");
+  const saveHabitChangesButton = document.getElementById("save-habit-changes");
+  const cancelHabitEditButton = document.getElementById("cancel-habit-edit");
 
   // Stats Elements
   const statsRangeSelector = document.getElementById("stats-range-selector");
-  const statsPresetButtons = statsRangeSelector?.querySelectorAll(".stats-range-presets button[data-range]");
-  const statsCustomRangeDiv = statsRangeSelector?.querySelector(".stats-range-custom");
+  const statsPresetButtons = statsRangeSelector?.querySelectorAll(
+    ".stats-range-presets button[data-range]"
+  );
+  const statsCustomRangeDiv = statsRangeSelector?.querySelector(
+    ".stats-range-custom"
+  );
   const statsStartDateInput = document.getElementById("stats-start-date");
   const statsEndDateInput = document.getElementById("stats-end-date");
-  const statsApplyCustomBtn = document.getElementById("stats-apply-custom-range");
+  const statsApplyCustomBtn = document.getElementById(
+    "stats-apply-custom-range"
+  );
   // *** CORRECTED IDs HERE ***
-  const dailyScoreChartCtx = document.getElementById("daily-score-chart")?.getContext("2d");
-  const singleHabitChartCtx = document.getElementById("single-habit-chart")?.getContext("2d");
+  const dailyScoreChartCtx = document
+    .getElementById("daily-score-chart")
+    ?.getContext("2d");
+  const singleHabitChartCtx = document
+    .getElementById("single-habit-chart")
+    ?.getContext("2d");
   // *** CORRECTED ID HERE ***
   const habitStatsSelector = document.getElementById("habit-stats-selector");
   const overallStreakDisplay = document.getElementById("overall-streak-value");
   const habitStreakDisplay = document.getElementById("habit-streak-value");
-  const dailyScoreChartTitle = document.getElementById("daily-score-chart-title");
+  const dailyScoreChartTitle = document.getElementById(
+    "daily-score-chart-title"
+  );
   const habitPerfChartTitle = document.getElementById("habit-perf-chart-title");
 
   // Data Management Elements
@@ -53,25 +73,39 @@ document.addEventListener("DOMContentLoaded", () => {
     appState: "appStateData_v2",
   };
 
-   // Chart Colors (Catppuccin Macchiato) - Assuming this is correct
-   const chartColors = {
-      rosewater: '#f4dbd6', pink: '#f0c6c6', mauve: '#c6a0f6', red: '#ed8796',
-      maroon: '#ee99a0', peach: '#f5a97f', yellow: '#eed49f', green: '#a6da95',
-      teal: '#8bd5ca', sky: '#91d7e3', sapphire: '#7dc4e4', blue: '#8aadf4',
-      lavender: '#b7bdf8', text: '#cad3f5', subtle: '#a5adce', overlay: '#939ab7',
-      surface0: '#363a4f', surface1: '#494d64', surface2: '#5b6078',
-      base: '#24273a', mantle: '#1e2030', crust: '#181926',
-      // Backgrounds with alpha
-      mauve_bg: 'rgba(198, 160, 246, 0.25)',
-      blue_bg: 'rgba(138, 173, 244, 0.25)',
-      green_bg: 'rgba(166, 218, 149, 0.25)',
-      grid: 'rgba(73, 77, 100, 0.4)' // surface1 with alpha
+  // Chart Colors (Catppuccin Macchiato) - Assuming this is correct
+  const chartColors = {
+    rosewater: "#f4dbd6",
+    pink: "#f0c6c6",
+    mauve: "#c6a0f6",
+    red: "#ed8796",
+    maroon: "#ee99a0",
+    peach: "#f5a97f",
+    yellow: "#eed49f",
+    green: "#a6da95",
+    teal: "#8bd5ca",
+    sky: "#91d7e3",
+    sapphire: "#7dc4e4",
+    blue: "#8aadf4",
+    lavender: "#b7bdf8",
+    text: "#cad3f5",
+    subtle: "#a5adce",
+    overlay: "#939ab7",
+    surface0: "#363a4f",
+    surface1: "#494d64",
+    surface2: "#5b6078",
+    base: "#24273a",
+    mantle: "#1e2030",
+    crust: "#181926",
+    // Backgrounds with alpha
+    mauve_bg: "rgba(198, 160, 246, 0.25)",
+    blue_bg: "rgba(138, 173, 244, 0.25)",
+    green_bg: "rgba(166, 218, 149, 0.25)",
+    grid: "rgba(73, 77, 100, 0.4)", // surface1 with alpha
   };
 
   // == APPLICATION STATE == (Keep the rest of your JS code the same)
   // ... rest of your app.js code ...
-
-
 
   // =========================================================================
   // == APPLICATION STATE
@@ -457,6 +491,86 @@ document.addEventListener("DOMContentLoaded", () => {
         : "--";
     finalScoreDisplay.textContent = scoreText;
   }
+
+  // --- NEW: Function to close the edit modal ---
+  function closeEditHabitModal() {
+    if (editHabitModal && editHabitForm) {
+      editHabitModal.style.display = "none"; // Hide the modal
+      editHabitForm.reset(); // Clear the form fields
+      editHabitIdInput.value = ""; // Clear the hidden ID
+    }
+  }
+
+  // --- NEW: Function to handle saving habit changes ---
+  function handleSaveHabitChanges(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    const habitId = editHabitIdInput.value;
+    const newName = editHabitNameInput.value.trim();
+    const newWeight = parseFloat(editHabitWeightInput.value);
+    const newDescription = editHabitDescInput.value.trim();
+
+    // Validation
+    if (!newName) {
+      alert("Habit name cannot be empty.");
+      editHabitNameInput.focus();
+      return;
+    }
+    if (isNaN(newWeight) || newWeight < 0) {
+      alert("Weight must be a non-negative number.");
+      editHabitWeightInput.focus();
+      return;
+    }
+    if (!habitId) {
+      alert("Error: Habit ID is missing. Cannot save changes.");
+      console.error("Habit ID missing from edit form.");
+      return;
+    }
+
+    // Find the habit in the main habits array
+    const habitIndex = habits.findIndex((h) => h.id === habitId);
+    if (habitIndex === -1) {
+      alert("Error: Could not find the habit to update.");
+      console.error(`Habit with ID ${habitId} not found during save.`);
+      closeEditHabitModal(); // Close modal even if error occurs
+      return;
+    }
+
+    // Update the habit object directly in the array
+    habits[habitIndex].name = newName;
+    habits[habitIndex].weight = newWeight;
+    habits[habitIndex].description = newDescription;
+
+    console.log(`Updated habit "${newName}" (ID: ${habitId})`);
+
+    // Save all data
+    saveData();
+
+    // Close the modal
+    closeEditHabitModal();
+
+    // Re-render the necessary parts of the UI
+    renderEditPage(); // Refresh the habits list
+
+    // Also refresh other pages that might display habit info
+    if (
+      dailyLogPage &&
+      dailyLogPage.classList.contains("active") &&
+      dateInput
+    ) {
+      console.log("Refreshing daily log page after habit edit.");
+      renderDailyLogPage(dateInput.value);
+    }
+    if (statsPage && statsPage.classList.contains("active")) {
+      console.log("Refreshing stats page after habit edit.");
+      // Need to repopulate selector in case name changed, then re-render charts
+      populateHabitStatsSelector();
+      // Re-render both charts as weight change affects daily score, name affects habit chart title/data
+      renderDailyScoreChart();
+      renderSingleHabitChart(); // This will use the potentially updated name/data
+    }
+  }
+
   function renderEditPage() {
     console.log("Rendering Edit Habits Page...");
     if (!habitsList) {
@@ -494,7 +608,7 @@ document.addEventListener("DOMContentLoaded", () => {
             habit.isActive ? "Deactivate" : "Activate"
           } Habit">${
             habit.isActive ? "Deactivate" : "Activate"
-          }</button><button data-action="edit" disabled title="Not implemented">Edit</button><button data-action="delete" class="danger" title="Delete Habit">Delete</button></span></li>`
+          }</button><button data-action="edit" title="Edit Habit">Edit</button><button data-action="delete" class="danger" title="Delete Habit">Delete</button></span></li>` // REMOVED 'disabled' from edit button
       )
       .join("");
   }
@@ -788,11 +902,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const isBreak = log && log.isBreakDay;
 
       if (completed && !isBreak) {
-          currentHabitStreak++;
-          checkDate.setDate(checkDate.getDate() - 1); // Go back one day
+        currentHabitStreak++;
+        checkDate.setDate(checkDate.getDate() - 1); // Go back one day
       } else {
-          // Stop if missed, or if it was a break day (break days don't count towards streak)
-          break;
+        // Stop if missed, or if it was a break day (break days don't count towards streak)
+        break;
       }
     }
     if (habitStreakDisplay)
@@ -941,142 +1055,173 @@ document.addEventListener("DOMContentLoaded", () => {
     const DAYS_PER_BONUS_POINT = 7; // Earn 1 bonus point per week of streak
 
     if (dateStr) {
-        let streakEnteringToday = 0;
-        const currentLogDate = new Date(dateStr);
-        let checkDate = new Date(currentLogDate);
-        checkDate.setDate(checkDate.getDate() - 1); // Start checking from yesterday
+      let streakEnteringToday = 0;
+      const currentLogDate = new Date(dateStr);
+      let checkDate = new Date(currentLogDate);
+      checkDate.setDate(checkDate.getDate() - 1); // Start checking from yesterday
 
-        while (true) {
-            const checkDateStr = formatDate(checkDate);
-            const prevLog = dailyLogs[checkDateStr];
+      while (true) {
+        const checkDateStr = formatDate(checkDate);
+        const prevLog = dailyLogs[checkDateStr];
 
-            if (prevLog && !prevLog.isBreakDay && typeof prevLog.finalScore === 'number' && prevLog.finalScore >= 60) {
-                // Successful non-break day found, increment streak and continue checking
-                streakEnteringToday++;
-                checkDate.setDate(checkDate.getDate() - 1);
-            } else if (prevLog && prevLog.isBreakDay) {
-                // Break day found, skip it and continue checking
-                checkDate.setDate(checkDate.getDate() - 1);
-            } else {
-                // No log found, or failed day found, stop counting streak
-                break;
-            }
+        if (
+          prevLog &&
+          !prevLog.isBreakDay &&
+          typeof prevLog.finalScore === "number" &&
+          prevLog.finalScore >= 60
+        ) {
+          // Successful non-break day found, increment streak and continue checking
+          streakEnteringToday++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        } else if (prevLog && prevLog.isBreakDay) {
+          // Break day found, skip it and continue checking
+          checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+          // No log found, or failed day found, stop counting streak
+          break;
         }
+      }
 
-        if (streakEnteringToday > 0) {
-            streakBonus = Math.min(MAX_BONUS_POINTS, Math.floor(streakEnteringToday / DAYS_PER_BONUS_POINT));
-            if (streakBonus > 0) {
-              console.log(`Applying streak bonus: +${streakBonus} (Streak entering today: ${streakEnteringToday})`);
-            }
+      if (streakEnteringToday > 0) {
+        streakBonus = Math.min(
+          MAX_BONUS_POINTS,
+          Math.floor(streakEnteringToday / DAYS_PER_BONUS_POINT)
+        );
+        if (streakBonus > 0) {
+          console.log(
+            `Applying streak bonus: +${streakBonus} (Streak entering today: ${streakEnteringToday})`
+          );
         }
+      }
     } else {
-        console.warn("Date string not provided for streak bonus calculation.");
+      console.warn("Date string not provided for streak bonus calculation.");
     }
-
 
     const finalScoreWithBonus = baseScore + streakBonus;
     const finalClampedScore = Math.max(0, Math.min(finalScoreWithBonus, 100)); // Clamp final score between 0 and 100
 
     // Log if clamping occurred significantly
-     if (finalClampedScore === 100 && finalScoreWithBonus > 100) {
-        console.log(`Score calculated as ${finalScoreWithBonus.toFixed(2)}, clamped to 100.`);
+    if (finalClampedScore === 100 && finalScoreWithBonus > 100) {
+      console.log(
+        `Score calculated as ${finalScoreWithBonus.toFixed(2)}, clamped to 100.`
+      );
     } else if (baseScore > 0 && finalClampedScore === 0) {
-        console.log(`Score calculated as ${finalScoreWithBonus.toFixed(2)}, clamped to 0.`);
+      console.log(
+        `Score calculated as ${finalScoreWithBonus.toFixed(2)}, clamped to 0.`
+      );
     }
 
     return finalClampedScore;
   }
   function updateStreak(dateStr, logData) {
-      if (!logData || typeof logData !== 'object') {
-          console.error(`Cannot update streak for ${dateStr}: Invalid log data.`);
-          return;
+    if (!logData || typeof logData !== "object") {
+      console.error(`Cannot update streak for ${dateStr}: Invalid log data.`);
+      return;
+    }
+    if (!appState) {
+      console.error("Cannot update streak: App state invalid.");
+      return;
+    }
+
+    // If it's a break day, the streak is neither broken nor continued. It's frozen.
+    if (logData.isBreakDay) {
+      console.log(
+        `Streak Update (${dateStr}): Break Day. Streak frozen at ${appState.currentStreak}.`
+      );
+      logData.streakContinued = null; // Indicate neither continued nor broken
+      updateOverallStreakDisplay(); // Ensure display reflects potentially frozen streak
+      return;
+    }
+
+    // Ensure finalScore is calculated if it's missing
+    if (typeof logData.finalScore !== "number") {
+      logData.finalScore = calculateFinalDayScore(logData, dateStr);
+      if (typeof logData.finalScore !== "number") {
+        console.warn(
+          `Cannot update streak for ${dateStr}, invalid score calculated. Treating as failure.`
+        );
+        logData.streakContinued = false;
+        appState.currentStreak = 0;
+        // Don't update lastScoreDate on failure
+        updateOverallStreakDisplay();
+        return;
       }
-      if (!appState) {
-           console.error("Cannot update streak: App state invalid.");
-           return;
+    }
+
+    const finalScore = logData.finalScore;
+    const todaySuccess = finalScore >= 60;
+    const currentLogDate = new Date(dateStr);
+
+    // Find the date of the *last relevant* score (skipping break days)
+    let previousRelevantDateStr = null;
+    let checkDate = new Date(currentLogDate);
+    while (true) {
+      checkDate.setDate(checkDate.getDate() - 1); // Go back one day
+      const checkDateStr = formatDate(checkDate);
+      const prevLog = dailyLogs[checkDateStr];
+
+      if (!prevLog) {
+        // Reached beginning of logs or a gap
+        break;
+      } else if (!prevLog.isBreakDay) {
+        // Found the last non-break day, this is the relevant one
+        previousRelevantDateStr = checkDateStr;
+        break;
       }
+      // If it was a break day, continue loop
+    }
 
-      // If it's a break day, the streak is neither broken nor continued. It's frozen.
-      if (logData.isBreakDay) {
-          console.log(`Streak Update (${dateStr}): Break Day. Streak frozen at ${appState.currentStreak}.`);
-          logData.streakContinued = null; // Indicate neither continued nor broken
-          updateOverallStreakDisplay(); // Ensure display reflects potentially frozen streak
-          return;
-      }
+    // Get the date of the last *successful* score from appState
+    const lastSuccessfulDate = appState.lastScoreDate;
 
-      // Ensure finalScore is calculated if it's missing
-      if (typeof logData.finalScore !== 'number') {
-          logData.finalScore = calculateFinalDayScore(logData, dateStr);
-          if (typeof logData.finalScore !== 'number') {
-               console.warn(`Cannot update streak for ${dateStr}, invalid score calculated. Treating as failure.`);
-               logData.streakContinued = false;
-               appState.currentStreak = 0;
-               // Don't update lastScoreDate on failure
-               updateOverallStreakDisplay();
-               return;
-          }
-      }
+    // Check if today's success is consecutive to the last recorded success
+    // (meaning the last successful day was indeed the previous relevant day)
+    const isConsecutiveSuccess =
+      todaySuccess && lastSuccessfulDate === previousRelevantDateStr;
 
-      const finalScore = logData.finalScore;
-      const todaySuccess = finalScore >= 60;
-      const currentLogDate = new Date(dateStr);
-
-      // Find the date of the *last relevant* score (skipping break days)
-      let previousRelevantDateStr = null;
-      let checkDate = new Date(currentLogDate);
-      while (true) {
-          checkDate.setDate(checkDate.getDate() - 1); // Go back one day
-          const checkDateStr = formatDate(checkDate);
-          const prevLog = dailyLogs[checkDateStr];
-
-          if (!prevLog) {
-              // Reached beginning of logs or a gap
-              break;
-          } else if (!prevLog.isBreakDay) {
-              // Found the last non-break day, this is the relevant one
-              previousRelevantDateStr = checkDateStr;
-              break;
-          }
-          // If it was a break day, continue loop
-      }
-
-      // Get the date of the last *successful* score from appState
-      const lastSuccessfulDate = appState.lastScoreDate;
-
-      // Check if today's success is consecutive to the last recorded success
-      // (meaning the last successful day was indeed the previous relevant day)
-      const isConsecutiveSuccess = todaySuccess && (lastSuccessfulDate === previousRelevantDateStr);
-
-      if (todaySuccess) {
-          if (isConsecutiveSuccess) {
-              // Consecutive success, increment streak
-              appState.currentStreak = (appState.currentStreak || 0) + 1;
-          } else {
-              // First success after a break/failure, or start of tracking
-              appState.currentStreak = 1;
-          }
-          // Update the last successful date to today
-          appState.lastScoreDate = dateStr;
-          logData.streakContinued = true;
-          console.log(`Streak Update (${dateStr}): Success (Score ${finalScore.toFixed(1)}). New Streak: ${appState.currentStreak}. Last Success: ${appState.lastScoreDate}`);
+    if (todaySuccess) {
+      if (isConsecutiveSuccess) {
+        // Consecutive success, increment streak
+        appState.currentStreak = (appState.currentStreak || 0) + 1;
       } else {
-          // Failed today
-          logData.streakContinued = false;
-          // Check if the streak *was* active yesterday (i.e., last success was previous relevant day)
-          if (lastSuccessfulDate === previousRelevantDateStr) {
-              console.log(`Streak Update (${dateStr}): Failed (Score ${finalScore.toFixed(1)}). Streak broken. Resetting to 0.`);
-              appState.currentStreak = 0;
-          } else {
-              // Streak was already broken or non-existent before today
-               console.log(`Streak Update (${dateStr}): Failed (Score ${finalScore.toFixed(1)}). Streak was already 0 or gap.`);
-              appState.currentStreak = 0; // Ensure it's 0
-          }
-          // Don't update lastScoreDate on failure
+        // First success after a break/failure, or start of tracking
+        appState.currentStreak = 1;
       }
+      // Update the last successful date to today
+      appState.lastScoreDate = dateStr;
+      logData.streakContinued = true;
+      console.log(
+        `Streak Update (${dateStr}): Success (Score ${finalScore.toFixed(
+          1
+        )}). New Streak: ${appState.currentStreak}. Last Success: ${
+          appState.lastScoreDate
+        }`
+      );
+    } else {
+      // Failed today
+      logData.streakContinued = false;
+      // Check if the streak *was* active yesterday (i.e., last success was previous relevant day)
+      if (lastSuccessfulDate === previousRelevantDateStr) {
+        console.log(
+          `Streak Update (${dateStr}): Failed (Score ${finalScore.toFixed(
+            1
+          )}). Streak broken. Resetting to 0.`
+        );
+        appState.currentStreak = 0;
+      } else {
+        // Streak was already broken or non-existent before today
+        console.log(
+          `Streak Update (${dateStr}): Failed (Score ${finalScore.toFixed(
+            1
+          )}). Streak was already 0 or gap.`
+        );
+        appState.currentStreak = 0; // Ensure it's 0
+      }
+      // Don't update lastScoreDate on failure
+    }
 
-      updateOverallStreakDisplay();
+    updateOverallStreakDisplay();
   }
-
 
   // =========================================================================
   // == EVENT LISTENERS & HANDLERS
@@ -1118,190 +1263,235 @@ document.addEventListener("DOMContentLoaded", () => {
       deleteButton.addEventListener("click", handleDeleteAllData);
     else console.warn("Delete button missing.");
 
+    if (editHabitModal && cancelHabitEditButton && editHabitForm) {
+      // Close modal when clicking Cancel button
+      cancelHabitEditButton.addEventListener("click", closeEditHabitModal);
+
+      // Close modal when clicking on the overlay background
+      editHabitModal.addEventListener("click", (event) => {
+        // Check if the click is directly on the overlay, not the content inside
+        if (event.target === editHabitModal) {
+          closeEditHabitModal();
+        }
+      });
+
+      // Handle the form submission for saving changes
+      editHabitForm.addEventListener("submit", handleSaveHabitChanges);
+    } else {
+      console.warn(
+        "Edit habit modal elements missing, listeners not attached."
+      );
+    }
+
     // Note: Stats range listeners are attached *when the stats page is shown*
     // via setupStatsRangeListeners() called within showPage().
     console.log("General listeners setup.");
   }
   function setupStatsRangeListeners() {
-      if (!statsRangeSelector) {
-          console.warn("Stats range selector missing. Cannot attach listeners.");
-          return;
-      }
-      console.log("Setting up Stats Range listeners...");
+    if (!statsRangeSelector) {
+      console.warn("Stats range selector missing. Cannot attach listeners.");
+      return;
+    }
+    console.log("Setting up Stats Range listeners...");
 
-      // Use event delegation on the container for preset buttons
-      const presetContainer = statsRangeSelector.querySelector(".stats-range-presets");
-      if (presetContainer) {
-          // Remove previous listener if any, to prevent duplicates
-          presetContainer.removeEventListener("click", handleStatsPresetClick);
-          presetContainer.addEventListener("click", handleStatsPresetClick);
-      } else {
-           console.warn("Preset button container not found.");
-      }
+    // Use event delegation on the container for preset buttons
+    const presetContainer = statsRangeSelector.querySelector(
+      ".stats-range-presets"
+    );
+    if (presetContainer) {
+      // Remove previous listener if any, to prevent duplicates
+      presetContainer.removeEventListener("click", handleStatsPresetClick);
+      presetContainer.addEventListener("click", handleStatsPresetClick);
+    } else {
+      console.warn("Preset button container not found.");
+    }
 
-      // Listener for the "Apply" button for custom range
-      if (statsApplyCustomBtn) {
-          statsApplyCustomBtn.removeEventListener("click", handleStatsApplyCustom);
-          statsApplyCustomBtn.addEventListener("click", handleStatsApplyCustom);
-      } else {
-           console.warn("Apply custom range button not found.");
-      }
+    // Listener for the "Apply" button for custom range
+    if (statsApplyCustomBtn) {
+      statsApplyCustomBtn.removeEventListener("click", handleStatsApplyCustom);
+      statsApplyCustomBtn.addEventListener("click", handleStatsApplyCustom);
+    } else {
+      console.warn("Apply custom range button not found.");
+    }
 
-      // Listeners for changes in the date inputs themselves
-      if (statsStartDateInput) {
-          statsStartDateInput.removeEventListener("change", handleCustomDateInputChange);
-          statsStartDateInput.addEventListener("change", handleCustomDateInputChange);
-      } else {
-           console.warn("Stats start date input not found.");
-      }
-      if (statsEndDateInput) {
-          statsEndDateInput.removeEventListener("change", handleCustomDateInputChange);
-          statsEndDateInput.addEventListener("change", handleCustomDateInputChange);
-      } else {
-          console.warn("Stats end date input not found.");
-      }
+    // Listeners for changes in the date inputs themselves
+    if (statsStartDateInput) {
+      statsStartDateInput.removeEventListener(
+        "change",
+        handleCustomDateInputChange
+      );
+      statsStartDateInput.addEventListener(
+        "change",
+        handleCustomDateInputChange
+      );
+    } else {
+      console.warn("Stats start date input not found.");
+    }
+    if (statsEndDateInput) {
+      statsEndDateInput.removeEventListener(
+        "change",
+        handleCustomDateInputChange
+      );
+      statsEndDateInput.addEventListener("change", handleCustomDateInputChange);
+    } else {
+      console.warn("Stats end date input not found.");
+    }
 
-      console.log("Stats range listeners attached.");
+    console.log("Stats range listeners attached.");
   }
   function handleStatsPresetClick(event) {
-      const button = event.target.closest("button[data-range]");
-      if (!button) return; // Click wasn't on a button or its child
+    const button = event.target.closest("button[data-range]");
+    if (!button) return; // Click wasn't on a button or its child
 
-      const range = button.dataset.range;
+    const range = button.dataset.range;
 
-      if (range === "custom-toggle") {
-          // User clicked the "Custom" button itself
-          toggleCustomRangeInput(true); // Toggle visibility
-          if (statsCustomRangeDiv?.style.display === 'flex' && currentStatsRange.type !== 'custom') {
-               // If opening custom panel AND not already in custom mode, set default dates and make it the current type
-               setDefaultCustomDates();
-               currentStatsRange = { type: 'custom', start: statsStartDateInput?.value || null, end: statsEndDateInput?.value || null };
-               updateStatsRangeUI(); // Update button appearance
-               renderStatsPage(); // Redraw charts for the new default custom range
-          } else if (statsCustomRangeDiv?.style.display === 'none' && currentStatsRange.type === 'custom') {
-              // If closing custom panel AND was in custom mode, revert to default (e.g., 30d)
-              console.log("Custom panel closed by user, reverting state to 30d.");
-              currentStatsRange = { type: '30d', start: null, end: null };
-              updateStatsRangeUI();
-              renderStatsPage();
-          } else {
-              // Just toggling visibility, but state might already match, only update UI
-              updateStatsRangeUI();
-          }
+    if (range === "custom-toggle") {
+      // User clicked the "Custom" button itself
+      toggleCustomRangeInput(true); // Toggle visibility
+      if (
+        statsCustomRangeDiv?.style.display === "flex" &&
+        currentStatsRange.type !== "custom"
+      ) {
+        // If opening custom panel AND not already in custom mode, set default dates and make it the current type
+        setDefaultCustomDates();
+        currentStatsRange = {
+          type: "custom",
+          start: statsStartDateInput?.value || null,
+          end: statsEndDateInput?.value || null,
+        };
+        updateStatsRangeUI(); // Update button appearance
+        renderStatsPage(); // Redraw charts for the new default custom range
+      } else if (
+        statsCustomRangeDiv?.style.display === "none" &&
+        currentStatsRange.type === "custom"
+      ) {
+        // If closing custom panel AND was in custom mode, revert to default (e.g., 30d)
+        console.log("Custom panel closed by user, reverting state to 30d.");
+        currentStatsRange = { type: "30d", start: null, end: null };
+        updateStatsRangeUI();
+        renderStatsPage();
       } else {
-          // User clicked a preset button (7d, 30d, etc.)
-          console.log(`Preset range selected: ${range}`);
-          currentStatsRange = { type: range, start: null, end: null };
-          if (statsCustomRangeDiv) statsCustomRangeDiv.style.display = "none"; // Hide custom inputs
-          updateStatsRangeUI(); // Update button appearance
-          renderStatsPage(); // Redraw charts for the preset range
+        // Just toggling visibility, but state might already match, only update UI
+        updateStatsRangeUI();
       }
+    } else {
+      // User clicked a preset button (7d, 30d, etc.)
+      console.log(`Preset range selected: ${range}`);
+      currentStatsRange = { type: range, start: null, end: null };
+      if (statsCustomRangeDiv) statsCustomRangeDiv.style.display = "none"; // Hide custom inputs
+      updateStatsRangeUI(); // Update button appearance
+      renderStatsPage(); // Redraw charts for the preset range
+    }
   }
   function handleStatsApplyCustom() {
-      if (!statsStartDateInput || !statsEndDateInput) return;
-      const startDateStr = statsStartDateInput.value;
-      const endDateStr = statsEndDateInput.value;
+    if (!statsStartDateInput || !statsEndDateInput) return;
+    const startDateStr = statsStartDateInput.value;
+    const endDateStr = statsEndDateInput.value;
 
-      if (!startDateStr || !endDateStr) {
-          alert("Please select both start and end dates for the custom range.");
-          return;
-      }
+    if (!startDateStr || !endDateStr) {
+      alert("Please select both start and end dates for the custom range.");
+      return;
+    }
 
-      // Basic date validation
-      const startDate = new Date(startDateStr + "T00:00:00");
-      const endDate = new Date(endDateStr + "T00:00:00");
+    // Basic date validation
+    const startDate = new Date(startDateStr + "T00:00:00");
+    const endDate = new Date(endDateStr + "T00:00:00");
 
-      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-          alert("Invalid date format selected.");
-          return;
-      }
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      alert("Invalid date format selected.");
+      return;
+    }
 
-      if (startDate > endDate) {
-          alert("Start date cannot be after end date.");
-          return;
-      }
+    if (startDate > endDate) {
+      alert("Start date cannot be after end date.");
+      return;
+    }
 
-      console.log(`Applying custom range: ${startDateStr} to ${endDateStr}`);
-      currentStatsRange = { type: "custom", start: startDateStr, end: endDateStr };
-      updateStatsRangeUI(); // Update button states
-      renderStatsPage(); // Render charts with the applied custom range
+    console.log(`Applying custom range: ${startDateStr} to ${endDateStr}`);
+    currentStatsRange = {
+      type: "custom",
+      start: startDateStr,
+      end: endDateStr,
+    };
+    updateStatsRangeUI(); // Update button states
+    renderStatsPage(); // Render charts with the applied custom range
   }
   function handleCustomDateInputChange() {
-      // When a custom date input changes, we just need to update the UI state
-      // to reflect that the "Custom" button might need to stay active, but
-      // we don't re-render the charts until "Apply" is clicked.
-      console.log("Custom date input changed, updating UI state.");
-      updateStatsRangeUI();
+    // When a custom date input changes, we just need to update the UI state
+    // to reflect that the "Custom" button might need to stay active, but
+    // we don't re-render the charts until "Apply" is clicked.
+    console.log("Custom date input changed, updating UI state.");
+    updateStatsRangeUI();
   }
   function toggleCustomRangeInput(userInitiated = false) {
-      if (!statsCustomRangeDiv) return;
-      const isHidden = statsCustomRangeDiv.style.display === "none";
-      statsCustomRangeDiv.style.display = isHidden ? "flex" : "none";
+    if (!statsCustomRangeDiv) return;
+    const isHidden = statsCustomRangeDiv.style.display === "none";
+    statsCustomRangeDiv.style.display = isHidden ? "flex" : "none";
 
-      // Logic for reverting if closed is now handled in handleStatsPresetClick
+    // Logic for reverting if closed is now handled in handleStatsPresetClick
   }
   function setDefaultCustomDates() {
-      if (!statsStartDateInput || !statsEndDateInput) return;
-      const today = new Date();
-      const endDateStr = formatDate(today);
-      const startDate = new Date(today);
-      startDate.setDate(today.getDate() - 29); // Default to last 30 days
-      const startDateStr = formatDate(startDate);
-      statsStartDateInput.value = startDateStr;
-      statsEndDateInput.value = endDateStr;
-      console.log(`Default custom dates set: ${startDateStr} to ${endDateStr}`);
+    if (!statsStartDateInput || !statsEndDateInput) return;
+    const today = new Date();
+    const endDateStr = formatDate(today);
+    const startDate = new Date(today);
+    startDate.setDate(today.getDate() - 29); // Default to last 30 days
+    const startDateStr = formatDate(startDate);
+    statsStartDateInput.value = startDateStr;
+    statsEndDateInput.value = endDateStr;
+    console.log(`Default custom dates set: ${startDateStr} to ${endDateStr}`);
   }
 
   // --- CORRECTED updateStatsRangeUI ---
   function updateStatsRangeUI() {
-      if (!statsPresetButtons || !statsRangeSelector) { // Check selector existence too
-          console.warn("Cannot update stats range UI - elements missing.");
-          return;
+    if (!statsPresetButtons || !statsRangeSelector) {
+      // Check selector existence too
+      console.warn("Cannot update stats range UI - elements missing.");
+      return;
+    }
+
+    const isCustomModeActive = currentStatsRange.type === "custom";
+
+    // Ensure the custom date input section visibility matches the mode
+    if (statsCustomRangeDiv) {
+      statsCustomRangeDiv.style.display = isCustomModeActive ? "flex" : "none";
+    }
+
+    // Update active state for all buttons (presets + custom toggle)
+    statsPresetButtons.forEach((btn) => {
+      const range = btn.dataset.range;
+      let isActive = false; // Default to inactive
+
+      if (range === "custom-toggle") {
+        // The "Custom" toggle button is active if the current mode is 'custom'
+        isActive = isCustomModeActive;
+      } else {
+        // A preset button ('7d', '30d', etc.) is active if its range matches the current mode type
+        isActive = range === currentStatsRange.type;
       }
 
-      const isCustomModeActive = currentStatsRange.type === 'custom';
+      // Apply or remove the .active class
+      btn.classList.toggle("active", isActive);
+    });
 
-      // Ensure the custom date input section visibility matches the mode
-      if (statsCustomRangeDiv) {
-          statsCustomRangeDiv.style.display = isCustomModeActive ? 'flex' : 'none';
+    // If in custom mode, ensure the date inputs reflect the current state's start/end dates
+    if (isCustomModeActive) {
+      if (statsStartDateInput) {
+        statsStartDateInput.value = currentStatsRange.start || ""; // Use stored start date or empty string
       }
-
-      // Update active state for all buttons (presets + custom toggle)
-      statsPresetButtons.forEach((btn) => {
-          const range = btn.dataset.range;
-          let isActive = false; // Default to inactive
-
-          if (range === "custom-toggle") {
-              // The "Custom" toggle button is active if the current mode is 'custom'
-              isActive = isCustomModeActive;
-          } else {
-              // A preset button ('7d', '30d', etc.) is active if its range matches the current mode type
-              isActive = (range === currentStatsRange.type);
-          }
-
-          // Apply or remove the .active class
-          btn.classList.toggle("active", isActive);
-      });
-
-      // If in custom mode, ensure the date inputs reflect the current state's start/end dates
-      if (isCustomModeActive) {
-          if (statsStartDateInput) {
-              statsStartDateInput.value = currentStatsRange.start || ''; // Use stored start date or empty string
-          }
-          if (statsEndDateInput) {
-              statsEndDateInput.value = currentStatsRange.end || ''; // Use stored end date or empty string
-          }
-           // Optional: if start/end are null, maybe call setDefaultCustomDates?
-           // if (!currentStatsRange.start || !currentStatsRange.end) {
-           //     setDefaultCustomDates();
-           //     // If defaulting dates, also update currentStatsRange
-           //     currentStatsRange.start = statsStartDateInput?.value || null;
-           //     currentStatsRange.end = statsEndDateInput?.value || null;
-           // }
+      if (statsEndDateInput) {
+        statsEndDateInput.value = currentStatsRange.end || ""; // Use stored end date or empty string
       }
+      // Optional: if start/end are null, maybe call setDefaultCustomDates?
+      // if (!currentStatsRange.start || !currentStatsRange.end) {
+      //     setDefaultCustomDates();
+      //     // If defaulting dates, also update currentStatsRange
+      //     currentStatsRange.start = statsStartDateInput?.value || null;
+      //     currentStatsRange.end = statsEndDateInput?.value || null;
+      // }
+    }
   }
   // --- END OF CORRECTION ---
-
 
   function handleDateChange() {
     if (!dateInput) return;
@@ -1329,8 +1519,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!dailyLogs[dateStr]) {
       console.log(`Initializing log entry for ${dateStr} on input change.`);
       dailyLogs[dateStr] = {
-        focusedHours: 0, distractedHours: 0, isBreakDay: false,
-        completedHabitIds: [], tasks: [], finalScore: null, streakContinued: null,
+        focusedHours: 0,
+        distractedHours: 0,
+        isBreakDay: false,
+        completedHabitIds: [],
+        tasks: [],
+        finalScore: null,
+        streakContinued: null,
       };
     }
     let logData = dailyLogs[dateStr];
@@ -1348,14 +1543,17 @@ document.addEventListener("DOMContentLoaded", () => {
       // Handle habit checkboxes
       else if (target.matches('input[type="checkbox"][data-habit-id]')) {
         const habitId = target.dataset.habitId;
-        if (!Array.isArray(logData.completedHabitIds)) logData.completedHabitIds = []; // Ensure array exists
+        if (!Array.isArray(logData.completedHabitIds))
+          logData.completedHabitIds = []; // Ensure array exists
         if (target.checked) {
           if (!logData.completedHabitIds.includes(habitId)) {
             logData.completedHabitIds.push(habitId);
             console.log(`Habit ${habitId} marked complete for ${dateStr}`);
           }
         } else {
-          logData.completedHabitIds = logData.completedHabitIds.filter(id => id !== habitId);
+          logData.completedHabitIds = logData.completedHabitIds.filter(
+            (id) => id !== habitId
+          );
           console.log(`Habit ${habitId} marked incomplete for ${dateStr}`);
         }
       }
@@ -1366,118 +1564,136 @@ document.addEventListener("DOMContentLoaded", () => {
         const taskId = taskItem.dataset.taskId;
         const prop = target.dataset.taskProp; // 'assigned' or 'done'
         if (!Array.isArray(logData.tasks)) logData.tasks = []; // Ensure array exists
-        const task = logData.tasks.find(t => t.id === taskId);
+        const task = logData.tasks.find((t) => t.id === taskId);
         if (task && (prop === "assigned" || prop === "done")) {
           task[prop] = target.checked;
-          console.log(`Task ${taskId} property '${prop}' set to ${target.checked} for ${dateStr}`);
+          console.log(
+            `Task ${taskId} property '${prop}' set to ${target.checked} for ${dateStr}`
+          );
         } else {
-          console.warn(`Task ${taskId} not found or invalid property ${prop} for ${dateStr}`);
+          console.warn(
+            `Task ${taskId} not found or invalid property ${prop} for ${dateStr}`
+          );
         }
       }
       // Handle break day checkbox
-      else if (target.matches('input[type="checkbox"][data-log-prop="isBreakDay"]')) {
+      else if (
+        target.matches('input[type="checkbox"][data-log-prop="isBreakDay"]')
+      ) {
         logData.isBreakDay = target.checked;
         console.log(`isBreakDay for ${dateStr} set to ${logData.isBreakDay}`);
       }
 
       // Note: We don't save or recalculate score on every input change.
       // This happens when the user clicks "Save Progress".
-
     } catch (error) {
       console.error("Error handling log input change:", error, target);
     }
   }
   function handleAddDailyTask(event) {
-      // Ensure the event originated from the correct form submission
-      if (!event.target.matches("#add-daily-task-form")) return;
-      event.preventDefault(); // Prevent default form submission
+    // Ensure the event originated from the correct form submission
+    if (!event.target.matches("#add-daily-task-form")) return;
+    event.preventDefault(); // Prevent default form submission
 
-      const dateStr = dateInput?.value;
-      if (!dateStr) {
-          alert("Please select a date before adding tasks.");
-          return;
-      }
+    const dateStr = dateInput?.value;
+    if (!dateStr) {
+      alert("Please select a date before adding tasks.");
+      return;
+    }
 
-      const nameInput = document.getElementById("new-daily-task-name");
-      const descInput = document.getElementById("new-daily-task-desc");
-      if (!nameInput || !descInput) {
-          console.error("Task form input elements not found.");
-          alert("Error: Could not find task input fields.");
-          return;
-      }
+    const nameInput = document.getElementById("new-daily-task-name");
+    const descInput = document.getElementById("new-daily-task-desc");
+    if (!nameInput || !descInput) {
+      console.error("Task form input elements not found.");
+      alert("Error: Could not find task input fields.");
+      return;
+    }
 
-      const name = nameInput.value.trim();
-      const description = descInput.value.trim();
+    const name = nameInput.value.trim();
+    const description = descInput.value.trim();
 
-      if (!name) {
-          alert("Task name is required.");
-          nameInput.focus();
-          return;
-      }
+    if (!name) {
+      alert("Task name is required.");
+      nameInput.focus();
+      return;
+    }
 
-      // Ensure log entry and tasks array exist
-      if (!dailyLogs[dateStr]) {
-          dailyLogs[dateStr] = {
-              focusedHours: 0, distractedHours: 0, isBreakDay: false,
-              completedHabitIds: [], tasks: [], finalScore: null, streakContinued: null,
-          };
-      }
-      if (!Array.isArray(dailyLogs[dateStr].tasks)) {
-          dailyLogs[dateStr].tasks = [];
-      }
-
-      const newTask = {
-          id: generateId(),
-          name,
-          description,
-          assigned: true, // Default to assigned
-          done: false,     // Default to not done
+    // Ensure log entry and tasks array exist
+    if (!dailyLogs[dateStr]) {
+      dailyLogs[dateStr] = {
+        focusedHours: 0,
+        distractedHours: 0,
+        isBreakDay: false,
+        completedHabitIds: [],
+        tasks: [],
+        finalScore: null,
+        streakContinued: null,
       };
+    }
+    if (!Array.isArray(dailyLogs[dateStr].tasks)) {
+      dailyLogs[dateStr].tasks = [];
+    }
 
-      dailyLogs[dateStr].tasks.push(newTask);
-      console.log(`Task "${name}" added to log for ${dateStr}`);
+    const newTask = {
+      id: generateId(),
+      name,
+      description,
+      assigned: true, // Default to assigned
+      done: false, // Default to not done
+    };
 
-      // Re-render the daily log section to show the new task and clear the form
-      renderDailyLogPage(dateStr); // This will also clear the form implicitly
+    dailyLogs[dateStr].tasks.push(newTask);
+    console.log(`Task "${name}" added to log for ${dateStr}`);
+
+    // Re-render the daily log section to show the new task and clear the form
+    renderDailyLogPage(dateStr); // This will also clear the form implicitly
   }
   function handleDailyTaskActions(event) {
-      // Check if the click was on a delete button within a task item
-      const deleteButton = event.target.closest('button[data-action="delete-task"]');
-      if (!deleteButton) return; // Click wasn't on a delete button
+    // Check if the click was on a delete button within a task item
+    const deleteButton = event.target.closest(
+      'button[data-action="delete-task"]'
+    );
+    if (!deleteButton) return; // Click wasn't on a delete button
 
-      const taskItem = deleteButton.closest(".task-item[data-task-id]");
-      if (!taskItem) {
-           console.warn("Could not find parent task item for delete button.");
-           return;
-      }
+    const taskItem = deleteButton.closest(".task-item[data-task-id]");
+    if (!taskItem) {
+      console.warn("Could not find parent task item for delete button.");
+      return;
+    }
 
-      const taskId = taskItem.dataset.taskId;
-      const dateStr = dateInput?.value;
-      if (!dateStr) {
-           console.error("Cannot delete task: Date not selected.");
-           return;
-      }
+    const taskId = taskItem.dataset.taskId;
+    const dateStr = dateInput?.value;
+    if (!dateStr) {
+      console.error("Cannot delete task: Date not selected.");
+      return;
+    }
 
-      if (!dailyLogs[dateStr] || !Array.isArray(dailyLogs[dateStr].tasks)) {
-           console.warn(`Cannot delete task ${taskId}: No tasks found for ${dateStr}.`);
-           return;
-      }
+    if (!dailyLogs[dateStr] || !Array.isArray(dailyLogs[dateStr].tasks)) {
+      console.warn(
+        `Cannot delete task ${taskId}: No tasks found for ${dateStr}.`
+      );
+      return;
+    }
 
-      const taskIndex = dailyLogs[dateStr].tasks.findIndex(t => t.id === taskId);
+    const taskIndex = dailyLogs[dateStr].tasks.findIndex(
+      (t) => t.id === taskId
+    );
 
-      if (taskIndex > -1) {
-          const taskName = dailyLogs[dateStr].tasks[taskIndex].name;
-          // Remove the task from the array
-          dailyLogs[dateStr].tasks.splice(taskIndex, 1);
-          console.log(`Task "${taskName}" (ID: ${taskId}) deleted from log for ${dateStr}`);
+    if (taskIndex > -1) {
+      const taskName = dailyLogs[dateStr].tasks[taskIndex].name;
+      // Remove the task from the array
+      dailyLogs[dateStr].tasks.splice(taskIndex, 1);
+      console.log(
+        `Task "${taskName}" (ID: ${taskId}) deleted from log for ${dateStr}`
+      );
 
-          // Re-render the daily log page to reflect the deletion
-          renderDailyLogPage(dateStr);
-          // Optionally, save immediately after deletion or wait for explicit save
-          // saveData(); // Uncomment if immediate save on deletion is desired
-      } else {
-          console.warn(`Task ID ${taskId} not found in log for ${dateStr}.`);
-      }
+      // Re-render the daily log page to reflect the deletion
+      renderDailyLogPage(dateStr);
+      // Optionally, save immediately after deletion or wait for explicit save
+      // saveData(); // Uncomment if immediate save on deletion is desired
+    } else {
+      console.warn(`Task ID ${taskId} not found in log for ${dateStr}.`);
+    }
   }
   function handleSaveDailyLog() {
     const dateStr = dateInput?.value;
@@ -1491,20 +1707,30 @@ document.addEventListener("DOMContentLoaded", () => {
     // If no log data exists yet (e.g., user changed date but didn't interact)
     // try to create it from current form state.
     if (!logData) {
-      console.log(`No existing log for ${dateStr}. Attempting to create from inputs.`);
+      console.log(
+        `No existing log for ${dateStr}. Attempting to create from inputs.`
+      );
       try {
-        const focusedInput = document.getElementById(`focused-hours-${dateStr}`);
-        const distractedInput = document.getElementById(`distracted-hours-${dateStr}`);
-        const breakDayInput = document.getElementById(`is-break-day-${dateStr}`);
+        const focusedInput = document.getElementById(
+          `focused-hours-${dateStr}`
+        );
+        const distractedInput = document.getElementById(
+          `distracted-hours-${dateStr}`
+        );
+        const breakDayInput = document.getElementById(
+          `is-break-day-${dateStr}`
+        );
 
         logData = {
-            focusedHours: focusedInput ? (parseFloat(focusedInput.value) || 0) : 0,
-            distractedHours: distractedInput ? (parseFloat(distractedInput.value) || 0) : 0,
-            isBreakDay: breakDayInput ? breakDayInput.checked : false,
-            completedHabitIds: [], // Assume no habits checked if log didn't exist
-            tasks: [], // Assume no tasks if log didn't exist
-            finalScore: null,
-            streakContinued: null,
+          focusedHours: focusedInput ? parseFloat(focusedInput.value) || 0 : 0,
+          distractedHours: distractedInput
+            ? parseFloat(distractedInput.value) || 0
+            : 0,
+          isBreakDay: breakDayInput ? breakDayInput.checked : false,
+          completedHabitIds: [], // Assume no habits checked if log didn't exist
+          tasks: [], // Assume no tasks if log didn't exist
+          finalScore: null,
+          streakContinued: null,
         };
         // Note: This doesn't capture dynamically checked habits/tasks if logData was null.
         // It's better if interaction creates the logData object via handleDailyLogInputChange.
@@ -1521,7 +1747,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Recalculate the final score based on the latest state
     logData.finalScore = calculateFinalDayScore(logData, dateStr);
-    console.log(`Calculated score for ${dateStr}: ${logData.finalScore.toFixed(2)}`);
+    console.log(
+      `Calculated score for ${dateStr}: ${logData.finalScore.toFixed(2)}`
+    );
 
     // Update the overall streak based on this score and date
     updateStreak(dateStr, logData);
@@ -1538,9 +1766,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     console.log(
-      `Saved data for ${dateStr}! Score: ${logData.finalScore.toFixed(1)}, Current Streak: ${
-        appState.currentStreak
-      }`
+      `Saved data for ${dateStr}! Score: ${logData.finalScore.toFixed(
+        1
+      )}, Current Streak: ${appState.currentStreak}`
     );
 
     // Provide visual feedback on the save button
@@ -1578,8 +1806,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     // Check for duplicate names (case-insensitive)
     if (habits.some((h) => h.name.toLowerCase() === name.toLowerCase())) {
-      if (!confirm(`A habit named "${name}" already exists. Add another one anyway?`)) {
-           return; // User cancelled
+      if (
+        !confirm(
+          `A habit named "${name}" already exists. Add another one anyway?`
+        )
+      ) {
+        return; // User cancelled
       }
     }
     const newHabit = {
@@ -1599,69 +1831,97 @@ document.addEventListener("DOMContentLoaded", () => {
     addHabitForm.reset(); // Clear the form
 
     // If currently on the daily log page, refresh it to show the new habit option
-    if (dailyLogPage && dailyLogPage.classList.contains("active") && dateInput) {
-        renderDailyLogPage(dateInput.value);
+    if (
+      dailyLogPage &&
+      dailyLogPage.classList.contains("active") &&
+      dateInput
+    ) {
+      renderDailyLogPage(dateInput.value);
     }
     // If currently on the stats page, refresh the habit selector
     if (statsPage && statsPage.classList.contains("active")) {
-        populateHabitStatsSelector();
-        renderSingleHabitChart(); // Re-render chart (might be blank if new habit selected)
+      populateHabitStatsSelector();
+      renderSingleHabitChart(); // Re-render chart (might be blank if new habit selected)
     }
   }
   function handleHabitListActions(event) {
-      // Use event delegation - find the button that was clicked
-      const button = event.target.closest("button[data-action]");
-      if (!button) return; // Click wasn't on an action button
+    const button = event.target.closest("button[data-action]");
+    if (!button) return;
 
-      // Find the parent list item to get the habit ID
-      const listItem = button.closest("li[data-habit-id]");
-      if (!listItem) return;
+    const listItem = button.closest("li[data-habit-id]");
+    if (!listItem) return;
 
-      const habitId = listItem.dataset.habitId;
-      const action = button.dataset.action; // 'delete', 'toggle-active', 'edit'
+    const habitId = listItem.dataset.habitId;
+    const action = button.dataset.action;
 
-      if (!Array.isArray(habits)) return; // Should not happen if loaded correctly
+    if (!Array.isArray(habits)) return;
 
-      const habitIndex = habits.findIndex((h) => h.id === habitId);
-      if (habitIndex === -1) {
-          console.warn(`Habit with ID ${habitId} not found for action ${action}.`);
-          return;
+    const habitIndex = habits.findIndex((h) => h.id === habitId);
+    if (habitIndex === -1) {
+      console.warn(`Habit with ID ${habitId} not found for action ${action}.`);
+      return;
+    }
+    const habit = habits[habitIndex];
+
+    if (action === "delete") {
+      // ... (keep existing delete logic) ...
+      if (
+        confirm(
+          `Are you sure you want to permanently delete the habit "${habit.name}"? This cannot be undone.`
+        )
+      ) {
+        habits.splice(habitIndex, 1);
+        console.log(`Deleted habit "${habit.name}" (ID: ${habitId})`);
+        saveData();
+        renderEditPage();
+        if (
+          dailyLogPage &&
+          dailyLogPage.classList.contains("active") &&
+          dateInput
+        ) {
+          renderDailyLogPage(dateInput.value);
+        }
+        if (statsPage && statsPage.classList.contains("active")) {
+          renderStatsPage();
+        }
       }
-      const habit = habits[habitIndex];
-
-      if (action === "delete") {
-          if (confirm(`Are you sure you want to permanently delete the habit "${habit.name}"? This cannot be undone.`)) {
-              habits.splice(habitIndex, 1); // Remove from array
-              console.log(`Deleted habit "${habit.name}" (ID: ${habitId})`);
-              saveData();
-              renderEditPage(); // Refresh the list view
-              // Refresh other potentially affected views
-              if (dailyLogPage && dailyLogPage.classList.contains("active") && dateInput) {
-                  renderDailyLogPage(dateInput.value);
-              }
-              if (statsPage && statsPage.classList.contains("active")) {
-                   renderStatsPage(); // Full stats refresh needed
-              }
-          }
-      } else if (action === "toggle-active") {
-          habit.isActive = !habit.isActive;
-          habit.archivedDate = habit.isActive ? null : formatDate(new Date());
-          console.log(`Toggled habit "${habit.name}" (ID: ${habitId}) active status to: ${habit.isActive}`);
-          saveData();
-          renderEditPage(); // Refresh list view
-           // Refresh other potentially affected views
-          if (dailyLogPage && dailyLogPage.classList.contains("active") && dateInput) {
-              renderDailyLogPage(dateInput.value);
-          }
-          if (statsPage && statsPage.classList.contains("active")) {
-              populateHabitStatsSelector(); // Update selector options (e.g., (Inactive) label)
-              renderSingleHabitChart(); // Re-render habit chart
-          }
-      } else if (action === "edit") {
-          // TODO: Implement habit editing functionality (e.g., open a modal)
-          alert("Editing habits is not yet implemented.");
-          console.log(`Edit action triggered for habit ID: ${habitId}`);
+    } else if (action === "toggle-active") {
+      // ... (keep existing toggle logic) ...
+      habit.isActive = !habit.isActive;
+      habit.archivedDate = habit.isActive ? null : formatDate(new Date());
+      console.log(
+        `Toggled habit "${habit.name}" (ID: ${habitId}) active status to: ${habit.isActive}`
+      );
+      saveData();
+      renderEditPage();
+      if (
+        dailyLogPage &&
+        dailyLogPage.classList.contains("active") &&
+        dateInput
+      ) {
+        renderDailyLogPage(dateInput.value);
       }
+      if (statsPage && statsPage.classList.contains("active")) {
+        populateHabitStatsSelector();
+        renderSingleHabitChart();
+      }
+    } else if (action === "edit") {
+      // --- NEW: Open the edit modal ---
+      console.log(`Opening edit modal for habit ID: ${habitId}`);
+      if (editHabitModal && editHabitForm) {
+        // Populate the modal form with current habit data
+        editHabitIdInput.value = habit.id;
+        editHabitNameInput.value = habit.name;
+        editHabitWeightInput.value = habit.weight;
+        editHabitDescInput.value = habit.description || "";
+
+        // Show the modal
+        editHabitModal.style.display = "flex"; // Use flex to enable centering
+      } else {
+        console.error("Edit modal elements not found!");
+        alert("Could not open the edit form. Modal elements missing.");
+      }
+    }
   }
   function handleExportData() {
     console.log("Preparing data for export...");
@@ -1688,7 +1948,9 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("Export download initiated.");
     } catch (error) {
       console.error("Error during data export:", error);
-      alert("An error occurred while exporting data. Check the console for details.");
+      alert(
+        "An error occurred while exporting data. Check the console for details."
+      );
     }
   }
   function handleImportData() {
@@ -1712,34 +1974,64 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Successfully parsed imported JSON data.");
 
         // Basic validation of the imported structure
-        if (typeof importedData !== "object" || importedData === null) throw new Error("Imported data is not a valid object.");
-        if (!importedData.habits || !importedData.dailyLogs || !importedData.appState) throw new Error("Imported file is missing required sections (habits, dailyLogs, appState).");
-        if (!Array.isArray(importedData.habits)) throw new Error("Imported 'habits' section is not an array.");
-        if (typeof importedData.dailyLogs !== "object" || Array.isArray(importedData.dailyLogs)) throw new Error("Imported 'dailyLogs' section is not an object.");
-        if (typeof importedData.appState !== "object" || Array.isArray(importedData.appState)) throw new Error("Imported 'appState' section is not an object.");
+        if (typeof importedData !== "object" || importedData === null)
+          throw new Error("Imported data is not a valid object.");
+        if (
+          !importedData.habits ||
+          !importedData.dailyLogs ||
+          !importedData.appState
+        )
+          throw new Error(
+            "Imported file is missing required sections (habits, dailyLogs, appState)."
+          );
+        if (!Array.isArray(importedData.habits))
+          throw new Error("Imported 'habits' section is not an array.");
+        if (
+          typeof importedData.dailyLogs !== "object" ||
+          Array.isArray(importedData.dailyLogs)
+        )
+          throw new Error("Imported 'dailyLogs' section is not an object.");
+        if (
+          typeof importedData.appState !== "object" ||
+          Array.isArray(importedData.appState)
+        )
+          throw new Error("Imported 'appState' section is not an object.");
 
         console.log("Basic structure validation passed.");
 
         // Version Check (Optional but recommended)
-        const importVersion = importedData.version || 'unknown'; // Handle missing version property
-        if (importVersion !== 2.1 && importVersion !== 2) { // Allow importing slightly older v2
-            console.warn(`Importing data from a different version (${importVersion}). Current app version is 2.1.`);
-            if (!confirm(`Warning: The file you are importing is from version ${importVersion}, while the app expects version 2.1. There might be compatibility issues. Continue importing anyway?`)) {
-                console.log("Import cancelled by user due to version mismatch.");
-                importFile.value = ""; // Clear the input
-                return;
-            }
+        const importVersion = importedData.version || "unknown"; // Handle missing version property
+        if (importVersion !== 2.1 && importVersion !== 2) {
+          // Allow importing slightly older v2
+          console.warn(
+            `Importing data from a different version (${importVersion}). Current app version is 2.1.`
+          );
+          if (
+            !confirm(
+              `Warning: The file you are importing is from version ${importVersion}, while the app expects version 2.1. There might be compatibility issues. Continue importing anyway?`
+            )
+          ) {
+            console.log("Import cancelled by user due to version mismatch.");
+            importFile.value = ""; // Clear the input
+            return;
+          }
         }
 
         // Final Confirmation
-        if (confirm("WARNING: This will overwrite ALL your current habit data, logs, and streaks. This action cannot be undone. Are you absolutely sure you want to import this file?")) {
+        if (
+          confirm(
+            "WARNING: This will overwrite ALL your current habit data, logs, and streaks. This action cannot be undone. Are you absolutely sure you want to import this file?"
+          )
+        ) {
           console.log("User confirmed data overwrite.");
           // Replace current data with imported data
           habits = importedData.habits;
           dailyLogs = importedData.dailyLogs;
           appState = importedData.appState;
 
-          console.log("Data replaced. Running post-import validation and saving...");
+          console.log(
+            "Data replaced. Running post-import validation and saving..."
+          );
           // Run loadData again to potentially sanitize/migrate imported data if needed
           loadData(); // This also handles saving if changes were made during load
           // No need to call saveData() explicitly if loadData handles it
@@ -1754,7 +2046,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       } catch (error) {
         console.error("Import process failed:", error);
-        alert(`Import failed: ${error.message}. Please ensure the file is valid JSON and has the correct structure. Check console for details.`);
+        alert(
+          `Import failed: ${error.message}. Please ensure the file is valid JSON and has the correct structure. Check console for details.`
+        );
         importFile.value = ""; // Clear the input
       }
     };
@@ -1768,46 +2062,55 @@ document.addEventListener("DOMContentLoaded", () => {
     reader.readAsText(file); // Start reading the file content as text
   }
   function handleDeleteAllData() {
-      if (confirm("DANGER ZONE!\n\nAre you absolutely sure you want to delete ALL your habits, logs, and streak data? This action is permanent and cannot be undone!")) {
-          // Extra confirmation step
-          if (prompt("To confirm deletion, please type the word 'DELETE' in all caps:") === "DELETE") {
-              console.log("User confirmed deletion. Deleting all application data...");
+    if (
+      confirm(
+        "DANGER ZONE!\n\nAre you absolutely sure you want to delete ALL your habits, logs, and streak data? This action is permanent and cannot be undone!"
+      )
+    ) {
+      // Extra confirmation step
+      if (
+        prompt(
+          "To confirm deletion, please type the word 'DELETE' in all caps:"
+        ) === "DELETE"
+      ) {
+        console.log(
+          "User confirmed deletion. Deleting all application data..."
+        );
 
-              // Clear data from localStorage
-              localStorage.removeItem(LOCAL_STORAGE_KEYS.habits);
-              localStorage.removeItem(LOCAL_STORAGE_KEYS.dailyLogs);
-              localStorage.removeItem(LOCAL_STORAGE_KEYS.appState);
+        // Clear data from localStorage
+        localStorage.removeItem(LOCAL_STORAGE_KEYS.habits);
+        localStorage.removeItem(LOCAL_STORAGE_KEYS.dailyLogs);
+        localStorage.removeItem(LOCAL_STORAGE_KEYS.appState);
 
-              // Reset in-memory state variables
-              habits = [];
-              dailyLogs = {};
-              appState = { currentStreak: 0, lastScoreDate: null };
-              currentStatsRange = { type: "30d", start: null, end: null }; // Reset stats view state too
+        // Reset in-memory state variables
+        habits = [];
+        dailyLogs = {};
+        appState = { currentStreak: 0, lastScoreDate: null };
+        currentStatsRange = { type: "30d", start: null, end: null }; // Reset stats view state too
 
-              // Destroy any active Chart instances
-              if (dailyScoreChartInstance) {
-                  dailyScoreChartInstance.destroy();
-                  dailyScoreChartInstance = null;
-              }
-              if (singleHabitChartInstance) {
-                  singleHabitChartInstance.destroy();
-                  singleHabitChartInstance = null;
-              }
+        // Destroy any active Chart instances
+        if (dailyScoreChartInstance) {
+          dailyScoreChartInstance.destroy();
+          dailyScoreChartInstance = null;
+        }
+        if (singleHabitChartInstance) {
+          singleHabitChartInstance.destroy();
+          singleHabitChartInstance = null;
+        }
 
-              alert("All application data has been deleted.");
-              console.log("All data deleted successfully.");
+        alert("All application data has been deleted.");
+        console.log("All data deleted successfully.");
 
-              // Reset UI
-              setDefaultDate();
-              renderApp(); // Re-render the app (should show empty states)
-
-          } else {
-              console.log("Deletion cancelled: Incorrect confirmation text entered.");
-              alert("Deletion cancelled. Confirmation text did not match.");
-          }
+        // Reset UI
+        setDefaultDate();
+        renderApp(); // Re-render the app (should show empty states)
       } else {
-          console.log("Deletion cancelled by user.");
+        console.log("Deletion cancelled: Incorrect confirmation text entered.");
+        alert("Deletion cancelled. Confirmation text did not match.");
       }
+    } else {
+      console.log("Deletion cancelled by user.");
+    }
   }
 
   // =========================================================================
