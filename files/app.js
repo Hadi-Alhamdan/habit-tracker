@@ -495,7 +495,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- NEW: Function to close the edit modal ---
   function closeEditHabitModal() {
     if (editHabitModal && editHabitForm) {
-      editHabitModal.style.display = "none"; // Hide the modal
+      editHabitModal.classList.remove("visible");
       editHabitForm.reset(); // Clear the form fields
       editHabitIdInput.value = ""; // Clear the hidden ID
     }
@@ -1250,10 +1250,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // <<< MODIFICATION START: Add logging for habitsList listener >>>
     if (habitsList) {
-        console.log("Attaching click listener to habitsList:", habitsList);
-        habitsList.addEventListener("click", handleHabitListActions);
+      console.log("Attaching click listener to habitsList:", habitsList);
+      habitsList.addEventListener("click", handleHabitListActions);
     } else {
-        console.warn("Habits list container missing, listener NOT attached.");
+      console.warn("Habits list container missing, listener NOT attached.");
     }
     // <<< MODIFICATION END >>>
 
@@ -1849,15 +1849,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const button = event.target.closest("button[data-action]");
     console.log("Found button with data-action?:", button); // <<< Log 2
     if (!button) {
-        console.log("Click was not on or inside an action button."); // <<< Log 2a
-        return;
+      console.log("Click was not on or inside an action button."); // <<< Log 2a
+      return;
     }
 
     const listItem = button.closest("li[data-habit-id]");
     console.log("Found parent li with data-habit-id?:", listItem); // <<< Log 3
     if (!listItem) {
-        console.log("Could not find parent list item for button."); // <<< Log 3a
-        return;
+      console.log("Could not find parent list item for button."); // <<< Log 3a
+      return;
     }
 
     const habitId = listItem.dataset.habitId;
@@ -1865,77 +1865,109 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log(`Action detected: "${action}", Habit ID: ${habitId}`); // <<< Log 4
 
     if (!Array.isArray(habits)) {
-        console.error("Habits array is invalid!"); // Should not happen
-        return;
+      console.error("Habits array is invalid!"); // Should not happen
+      return;
     }
 
     const habitIndex = habits.findIndex((h) => h.id === habitId);
     console.log("Found habit at index:", habitIndex); // <<< Log 5
     if (habitIndex === -1) {
-        console.warn(`Habit with ID ${habitId} not found in array for action ${action}.`);
-        return;
+      console.warn(
+        `Habit with ID ${habitId} not found in array for action ${action}.`
+      );
+      return;
     }
     const habit = habits[habitIndex];
     console.log("Habit object found:", habit); // <<< Log 6
 
-
     if (action === "delete") {
-        console.log("Branching to: delete action"); // <<< Log 7a
-        // ... (keep existing delete logic) ...
-         if (confirm(`Are you sure you want to permanently delete the habit "${habit.name}"? This cannot be undone.`)) {
-            habits.splice(habitIndex, 1);
-            console.log(`Deleted habit "${habit.name}" (ID: ${habitId})`);
-            saveData();
-            renderEditPage();
-            if (dailyLogPage && dailyLogPage.classList.contains("active") && dateInput) {
-                renderDailyLogPage(dateInput.value);
-            }
-            if (statsPage && statsPage.classList.contains("active")) {
-                 renderStatsPage();
-            }
-        }
-    } else if (action === "toggle-active") {
-        console.log("Branching to: toggle-active action"); // <<< Log 7b
-        // ... (keep existing toggle logic) ...
-         habit.isActive = !habit.isActive;
-        habit.archivedDate = habit.isActive ? null : formatDate(new Date());
-        console.log(`Toggled habit "${habit.name}" (ID: ${habitId}) active status to: ${habit.isActive}`);
+      console.log("Branching to: delete action"); // <<< Log 7a
+      // ... (keep existing delete logic) ...
+      if (
+        confirm(
+          `Are you sure you want to permanently delete the habit "${habit.name}"? This cannot be undone.`
+        )
+      ) {
+        habits.splice(habitIndex, 1);
+        console.log(`Deleted habit "${habit.name}" (ID: ${habitId})`);
         saveData();
         renderEditPage();
-        if (dailyLogPage && dailyLogPage.classList.contains("active") && dateInput) {
-            renderDailyLogPage(dateInput.value);
+        if (
+          dailyLogPage &&
+          dailyLogPage.classList.contains("active") &&
+          dateInput
+        ) {
+          renderDailyLogPage(dateInput.value);
         }
         if (statsPage && statsPage.classList.contains("active")) {
-            populateHabitStatsSelector();
-            renderSingleHabitChart();
+          renderStatsPage();
         }
+      }
+    } else if (action === "toggle-active") {
+      console.log("Branching to: toggle-active action"); // <<< Log 7b
+      // ... (keep existing toggle logic) ...
+      habit.isActive = !habit.isActive;
+      habit.archivedDate = habit.isActive ? null : formatDate(new Date());
+      console.log(
+        `Toggled habit "${habit.name}" (ID: ${habitId}) active status to: ${habit.isActive}`
+      );
+      saveData();
+      renderEditPage();
+      if (
+        dailyLogPage &&
+        dailyLogPage.classList.contains("active") &&
+        dateInput
+      ) {
+        renderDailyLogPage(dateInput.value);
+      }
+      if (statsPage && statsPage.classList.contains("active")) {
+        populateHabitStatsSelector();
+        renderSingleHabitChart();
+      }
     } else if (action === "edit") {
-        console.log("Branching to: edit action"); // <<< Log 7c
+      console.log("Branching to: edit action"); // <<< Log 7c
 
-        console.log("Checking required modal elements:", { editHabitModal, editHabitForm, editHabitIdInput, editHabitNameInput, editHabitWeightInput, editHabitDescInput }); // <<< Log 8
+      console.log("Checking required modal elements:", {
+        editHabitModal,
+        editHabitForm,
+        editHabitIdInput,
+        editHabitNameInput,
+        editHabitWeightInput,
+        editHabitDescInput,
+      }); // <<< Log 8
 
-        if (editHabitModal && editHabitForm && editHabitIdInput && editHabitNameInput && editHabitWeightInput && editHabitDescInput ) {
-            console.log("Modal elements seem OK. Populating form..."); // <<< Log 9
-            // Populate the modal form with current habit data
-            editHabitIdInput.value = habit.id;
-            editHabitNameInput.value = habit.name;
-            editHabitWeightInput.value = habit.weight;
-            editHabitDescInput.value = habit.description || "";
-            console.log("Form populated."); // <<< Log 10
+      if (
+        editHabitModal &&
+        editHabitForm &&
+        editHabitIdInput &&
+        editHabitNameInput &&
+        editHabitWeightInput &&
+        editHabitDescInput
+      ) {
+        console.log("Modal elements seem OK. Populating form..."); // <<< Log 9
+        // Populate the modal form with current habit data
+        editHabitIdInput.value = habit.id;
+        editHabitNameInput.value = habit.name;
+        editHabitWeightInput.value = habit.weight;
+        editHabitDescInput.value = habit.description || "";
+        console.log("Form populated."); // <<< Log 10
 
-            // Show the modal
-            console.log("Attempting to show modal by setting display = 'flex'"); // <<< Log 11
-            editHabitModal.style.display = "flex";
-            console.log("Modal display style is now:", editHabitModal.style.display); // <<< Log 12
-
-        } else {
-            console.error("One or more required modal elements were not found! Cannot open modal."); // <<< Log 9 Error
-            alert("Error: Could not open the edit form because some modal HTML elements are missing or have incorrect IDs.");
-        }
+        // Show the modal
+        console.log("Attempting to show modal by adding '.visible' class");
+        editHabitModal.classList.add("visible");
+        console.log("Modal classList:", editHabitModal.classList);
+      } else {
+        console.error(
+          "One or more required modal elements were not found! Cannot open modal."
+        ); // <<< Log 9 Error
+        alert(
+          "Error: Could not open the edit form because some modal HTML elements are missing or have incorrect IDs."
+        );
+      }
     } else {
-        console.warn(`Unrecognized action: "${action}"`); // <<< Log 7d
+      console.warn(`Unrecognized action: "${action}"`); // <<< Log 7d
     }
-}
+  }
   function handleExportData() {
     console.log("Preparing data for export...");
     try {

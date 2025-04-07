@@ -1,7 +1,7 @@
-/* style.css - v1.4 (Consolidated with Stats Range Fixes) */
+/* style.css - v1.5 (Consolidated & Cleaned) */
 
 :root {
-    /* Catppuccin Latte Dark Palette */
+    /* Catppuccin Macchiato Palette (Darker Theme) */
     --base: #24273a;
     --mantle: #1e2030;
     --crust: #181926;
@@ -10,16 +10,19 @@
     --surface2: #5b6078;
     --text: #cad3f5;
     --subtle: #a5adce;
-    --overlay: #939ab7;
+    --overlay: #939ab7; /* Used for text/icons on colored backgrounds */
+    --overlay-bg: rgba(17, 17, 21, 0.7); /* Background overlay color */
+
+    /* Colors */
     --mauve: #c6a0f6;
     --mauve-hover: #d5b0ff; /* Slightly lighter Mauve for hover */
+    --mauve-bg: 'rgba(198, 160, 246, 0.25)';
     --red: #ed8796;
     --red-hover: #f1a3ae; /* Lighter Red for hover */
-    --green: #a6da95;
-    --blue: #8aadf4;
-    --blue-hover: #a0c0ff; /* Example hover for blue */
-    --blue-bg: 'rgba(138, 173, 244, 0.25)'; /* Added for consistency */
-
+    --green: #c6a0f6;
+    --blue: #c6a0f6;
+    --blue-hover: #c6a0f6; /* Example hover for blue */
+    --blue-bg: 'rgba(138, 173, 244, 0.25)';
 
     /* UI Variables */
     --border-radius-sm: 4px;
@@ -29,7 +32,10 @@
     --focus-ring-color: rgba(198, 160, 246, 0.4); /* Mauve with alpha */
 }
 
-/* General Styling */
+/* ============================== */
+/* ==      GLOBAL STYLES       == */
+/* ============================== */
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     line-height: 1.6;
@@ -42,17 +48,74 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Transitions */
-button, input, textarea, select, .kanban-card, a.nav-link {
+/* General Transitions */
+button, input, textarea, select, .kanban-card, a.nav-link, .modal-overlay, .modal-content {
     transition: background-color var(--transition-speed) ease,
                 border-color var(--transition-speed) ease,
                 color var(--transition-speed) ease,
                 box-shadow var(--transition-speed) ease,
                 opacity var(--transition-speed) ease,
+                visibility var(--transition-speed) ease, /* Added for modal */
                 transform var(--transition-speed) ease;
 }
 
-/* Header & Navigation */
+/* Headings */
+section h2 {
+    color: var(--text);
+    border-bottom: 1px solid var(--surface0);
+    padding-bottom: 0.8rem;
+    margin-top: 0;
+    margin-bottom: 2rem;
+    font-weight: 500;
+    font-size: 1.5rem;
+}
+
+section h3 {
+    margin-top: 2rem;
+    margin-bottom: 1.2rem;
+    color: var(--subtle);
+    font-weight: 500;
+    font-size: 1.2rem;
+}
+
+section h4 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--subtle);
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+/* Horizontal Rule */
+hr {
+    border: 0;
+    height: 1px;
+    background: var(--surface0);
+    margin: 2.5rem 0;
+}
+
+/* Lists (Base) */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Utility */
+small {
+    color: var(--subtle);
+    font-size: 0.9em;
+}
+
+/* Page Visibility */
+.page { display: none; }
+.page.active { display: block; }
+
+
+/* ============================== */
+/* ==     HEADER & LAYOUT      == */
+/* ============================== */
+
 header {
     background: var(--crust);
     color: var(--text);
@@ -61,7 +124,7 @@ header {
     border-bottom: 1px solid var(--surface0);
 }
 
-header h1 {
+header h1 { /* If you add a main H1 title */
     margin: 0 0 0.75rem 0;
     font-weight: 400;
     font-size: 1.75rem;
@@ -103,7 +166,6 @@ nav button.active {
     font-weight: 600;
 }
 
-/* Main Content Area */
 main {
     max-width: 950px;
     margin: 2rem auto;
@@ -113,52 +175,27 @@ main {
     border-radius: var(--border-radius-lg);
 }
 
-/* Page Visibility */
-.page { display: none; }
-.page.active { display: block; }
-
-section h2 {
-    color: var(--text);
-    border-bottom: 1px solid var(--surface0);
-    padding-bottom: 0.8rem;
-    margin-top: 0;
-    margin-bottom: 2rem;
-    font-weight: 500;
-    font-size: 1.5rem;
-}
-
-section h3 {
-    margin-top: 2rem;
-    margin-bottom: 1.2rem;
+footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding: 1.5rem;
     color: var(--subtle);
-    font-weight: 500;
-    font-size: 1.2rem;
+    font-size: 0.9em;
+    border-top: 1px solid var(--surface0);
 }
 
-section h4 {
-    margin-top: 1.5rem;
-    margin-bottom: 1rem;
-    color: var(--subtle);
-    font-weight: 500;
-    font-size: 1rem;
-}
+/* ============================== */
+/* ==      FORMS & INPUTS      == */
+/* ============================== */
 
-hr {
-    border: 0;
-    height: 1px;
-    background: var(--surface0);
-    margin: 2.5rem 0;
-}
-
-/* Forms & Inputs */
-form {
+form { /* Base form container styling */
     margin-bottom: 2rem;
     padding: 1.5rem;
     background-color: var(--mantle);
     border: 1px solid var(--surface0);
     border-radius: var(--border-radius-lg);
 }
-form div {
+form div { /* Spacing for form elements */
     margin-bottom: 1.2rem;
 }
 
@@ -173,6 +210,7 @@ label {
 
 input[type="text"],
 input[type="number"],
+input[type="date"],
 textarea,
 select {
     display: block;
@@ -183,7 +221,7 @@ select {
     font-size: 1rem;
     background-color: var(--surface0);
     color: var(--text);
-    box-sizing: border-box;
+    box-sizing: border-box; /* Important for width calculation */
 }
 input::placeholder, textarea::placeholder {
     color: var(--subtle);
@@ -197,19 +235,15 @@ input:focus, textarea:focus, select:focus {
     box-shadow: 0 0 0 2px var(--focus-ring-color);
 }
 
-/* Specific Date Input Styling */
+textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
 input[type="date"] {
-    display: block; /* Or inline-block if needed */
-    width: auto; /* Allow sizing */
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--surface1);
-    border-radius: var(--border-radius-md);
-    font-size: 1rem;
-    background-color: var(--surface0);
-    color: var(--text);
-    box-sizing: border-box;
-    min-width: 160px; /* Ensure minimum width */
-    color-scheme: dark; /* Hint for dark mode picker */
+    width: auto; /* Override general width: 100% */
+    min-width: 160px;
+    color-scheme: dark;
 }
 input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(70%) sepia(10%) saturate(500%) hue-rotate(200deg) brightness(90%) contrast(90%); /* Try to theme icon */
@@ -221,13 +255,27 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     opacity: 1;
 }
 
-
-textarea {
-    min-height: 80px;
-    resize: vertical;
+input[type="checkbox"] { /* Base checkbox styling */
+    margin-right: 0.5rem;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--mauve);
+    cursor: pointer;
+    flex-shrink: 0;
+    vertical-align: middle; /* Align better with text */
+}
+input[type="checkbox"]:focus {
+     outline: 2px solid transparent;
+     outline-offset: 2px;
+     box-shadow: 0 0 0 2px var(--focus-ring-color);
 }
 
-button {
+
+/* ============================== */
+/* ==         BUTTONS          == */
+/* ============================== */
+
+button { /* Base button style */
     background: var(--mauve);
     color: var(--crust);
     padding: 0.7rem 1.5rem;
@@ -236,10 +284,12 @@ button {
     cursor: pointer;
     font-size: 0.95rem;
     font-weight: 500;
-    margin-top: 0.5rem;
+    margin-top: 0.5rem; /* Default top margin */
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
+    vertical-align: middle;
 }
 
 button:hover {
@@ -252,8 +302,7 @@ button:focus {
     box-shadow: 0 0 0 2px var(--focus-ring-color);
 }
 
-
-button.danger, #delete-all-data {
+button.danger, #delete-all-data { /* Danger button variant */
     background-color: var(--red);
     color: var(--crust);
 }
@@ -261,46 +310,10 @@ button.danger:hover, #delete-all-data:hover {
     background-color: var(--red-hover);
 }
 
-/* Lists (Habits, Tasks) */
-ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#habits-list li {
-    background: var(--mantle);
-    border: 1px solid var(--surface0);
-    margin-bottom: 0.8rem;
-    padding: 1rem 1.2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: var(--border-radius-lg);
-    flex-wrap: wrap;
-    gap: 0.8rem;
-}
-
-#habits-list li span:first-child { /* Content span */
-    flex-grow: 1;
-    margin-right: 1rem;
-    line-height: 1.4;
-}
-#habits-list li span strong {
-    color: var(--text);
-    font-weight: 500;
-}
-
-#habits-list li span small { /* Description */
-    color: var(--subtle);
-    display: block;
-    margin-top: 0.2rem;
-    font-size: 0.9em;
-}
-
-#habits-list li .controls button {
+/* Button size overrides */
+#habits-list li .controls button { /* Smaller buttons in habit list */
     margin-left: 0.5rem;
-    padding: 0.4rem 0.8rem; /* Smaller buttons */
+    padding: 0.4rem 0.8rem;
     font-size: 0.85em;
     margin-top: 0;
     background-color: var(--surface1);
@@ -309,6 +322,7 @@ ul {
 #habits-list li .controls button:hover {
     background-color: var(--surface2);
 }
+/* Specific overrides within habit list controls */
 #habits-list li .controls button[data-action="delete"] {
     background-color: var(--red);
     color: var(--crust);
@@ -317,13 +331,70 @@ ul {
     background-color: var(--red-hover);
 }
 
+/* Text/Icon style buttons */
+#daily-tasks-list .task-item button.delete-task-btn,
+.kanban-card .delete-goal-btn,
+.modal-close-btn {
+     background: none;
+     border: none;
+     color: var(--subtle);
+     padding: 0.3rem 0.5rem;
+     font-size: 1.2em;
+     line-height: 1;
+     border-radius: var(--border-radius-sm);
+     cursor: pointer;
+     margin-top: 0; /* Remove default margin */
+     opacity: 0.7; /* Slight fade */
+}
+#daily-tasks-list .task-item button.delete-task-btn {
+     margin-left: auto; /* Pushes to the right if space allows */
+     color: var(--red);
+}
+.kanban-card .delete-goal-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 1.2rem;
+}
+.modal-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.6rem;
+    border-radius: 50%;
+}
 
-/* Daily Log Specific Styles */
-.date-selector { /* Style the date selector container */
+/* Hover states for text/icon buttons */
+#daily-tasks-list .task-item button.delete-task-btn:hover,
+.kanban-card:hover .delete-goal-btn,
+.modal-close-btn:hover {
+    opacity: 1;
+}
+#daily-tasks-list .task-item button.delete-task-btn:hover {
+    background-color: rgba(237, 135, 150, 0.1); /* Red subtle hover */
+    color: var(--red-hover);
+}
+.kanban-card:hover .delete-goal-btn {
+    color: var(--red);
+}
+.kanban-card .delete-goal-btn:hover {
+     background-color: rgba(237, 135, 150, 0.1);
+     color: var(--red-hover);
+}
+.modal-close-btn:hover {
+    color: var(--text);
+    background-color: var(--surface1);
+}
+
+/* ============================== */
+/* ==    DAILY LOG PAGE        == */
+/* ============================== */
+
+.date-selector {
      margin-bottom: 1.5rem;
 }
 .date-selector label {
-     display: inline-block; /* Align label and input */
+     display: inline-block;
      margin-right: 0.8rem;
      margin-bottom: 0; /* Remove bottom margin */
 }
@@ -332,122 +403,73 @@ ul {
     width: auto; /* Size naturally */
 }
 
-
 .log-inputs-container {
     display: flex;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    gap: 1rem 2rem; /* Row gap, Column gap */
-    align-items: center; /* Vertically align items in a row */
-    margin-bottom: 1.5rem; /* Space below this block */
-    padding: 1rem; /* Add some padding around the inputs */
-    background-color: var(--mantle); /* Match form background */
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: var(--mantle);
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--surface0);
 }
 
 .log-input-group {
-    display: flex; /* Align label and input horizontally */
+    display: flex;
     align-items: center;
-    gap: 0.6rem; /* Space between label and input */
-    margin-bottom: 0; /* Remove bottom margin from individual group */
+    gap: 0.6rem;
+    margin-bottom: 0;
 }
 
 .log-input-group label {
-     margin-bottom: 0; /* Remove bottom margin */
+     margin-bottom: 0;
      white-space: nowrap;
-     color: var(--subtle); /* Use subtle color for labels */
+     color: var(--subtle);
      font-size: 0.9em;
 }
 
 .log-input-group input[type="number"] {
-     width: 75px; /* Slightly smaller width */
+     width: 75px;
      flex-shrink: 0;
-     padding: 0.5rem 0.7rem; /* Adjust padding */
-     font-size: 0.95em; /* Match label size */
+     padding: 0.5rem 0.7rem;
+     font-size: 0.95em;
 }
 
 .break-day-control {
     /* Inherits flex alignment from .log-inputs-container */
-    /* Is now also a .log-input-group */
+    /* Is also a .log-input-group */
     flex-grow: 1; /* Allow it to take remaining space if needed */
     justify-content: flex-start; /* Align checkbox/label left */
     padding-left: 1rem; /* Add some space if it wraps */
 }
 
-.break-day-control label {
+.break-day-control label { /* Overrides general label */
     font-weight: normal;
     color: var(--subtle);
     font-size: 0.9em;
     cursor: pointer;
 }
 .break-day-control input[type="checkbox"] {
-    margin-right: 0.5rem;
-    width: 16px;
-    height: 16px;
-    accent-color: var(--mauve);
-    cursor: pointer;
-    flex-shrink: 0; /* Prevent checkbox shrinking */
-}
-.break-day-control input[type="checkbox"]:focus {
-    outline: 2px solid transparent;
-    outline-offset: 2px;
-    box-shadow: 0 0 0 2px var(--focus-ring-color);
+    /* Uses base checkbox styles */
 }
 
-
-.daily-log-item {
-    padding: 1rem 0;
-    border-bottom: 1px solid var(--surface0);
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-.daily-log-item:last-child {
-    border-bottom: none;
-}
-/* Habit item specific label color */
-.daily-log-item.habit-item > label {
-    font-weight: normal;
-    color: var(--text);
-    margin: 0;
-    cursor: pointer;
-}
-.daily-log-item input[type="checkbox"] {
-    margin-right: 0.5rem;
-    width: 16px;
-    height: 16px;
-    accent-color: var(--mauve);
-    cursor: pointer;
-}
-.daily-log-item input[type="checkbox"]:focus {
-     outline: 2px solid transparent;
-     outline-offset: 2px;
-     box-shadow: 0 0 0 2px var(--focus-ring-color);
-}
-.habit-weight {
-    font-size: 0.85em;
-    color: var(--subtle);
-    margin-left: 0.3rem;
-}
-
-/* Daily task list styling */
-#daily-tasks-list {
-    margin-top: 1rem;
-}
-.daily-log-section { /* Common styling for habit/task sections */
-    padding: 0.5rem 0; /* Reduced vertical padding */
+/* Container for habit/task lists */
+.daily-log-section {
+    padding: 0.5rem 0;
     background-color: var(--mantle);
     border: 1px solid var(--surface0);
     border-radius: var(--border-radius-lg);
     margin-bottom: 1.5rem;
 }
-/* Adjust padding for first/last items inside section */
+/* Padding/border adjustment for items inside the section */
 .daily-log-section > .daily-log-item:first-child { padding-top: 1rem; }
 .daily-log-section > .daily-log-item:last-child { padding-bottom: 1rem; border-bottom: none; }
-.daily-log-section > .daily-log-item { padding-left: 1rem; padding-right: 1rem; } /* Add horizontal padding */
-
-
+.daily-log-section > .daily-log-item {
+    padding-left: 1rem;
+    padding-right: 1rem;
+     border-bottom: 1px solid var(--surface0);
+}
 .daily-log-section p.empty-message {
     color: var(--subtle);
     font-style: italic;
@@ -456,19 +478,44 @@ ul {
     margin: 0;
 }
 
-#daily-tasks-list .task-item { /* Task item already has daily-log-item styles */
-    /* Remove padding/border overrides, handled by .daily-log-section now */
-    flex-direction: column;
-    align-items: stretch; /* Stretch items full width */
+/* Individual log items */
+.daily-log-item {
+    padding: 1rem 0; /* Base padding, overridden by section */
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.daily-log-item:last-child {
+    border-bottom: none;
 }
 
-#daily-tasks-list .task-item .task-details { /* Task name/desc block */
+/* Habit specific styling */
+.daily-log-item.habit-item > label {
+    font-weight: normal;
+    color: var(--text);
+    margin: 0; /* Reset */
+    cursor: pointer;
+}
+.habit-weight {
+    font-size: 0.85em;
+    color: var(--subtle);
+    margin-left: 0.3rem;
+}
+
+/* Task specific styling */
+#daily-tasks-list .task-item {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+#daily-tasks-list .task-item .task-details {
     font-weight: 500;
     color: var(--text);
     line-height: 1.4;
-    margin-bottom: 0.5rem; /* Space below text */
+    margin-bottom: 0.5rem;
 }
-#daily-tasks-list .task-item .task-details small {
+#daily-tasks-list .task-item .task-details small { /* Task description */
     color: var(--subtle);
     display: block;
     font-weight: normal;
@@ -476,7 +523,7 @@ ul {
     margin-top: 0.2rem;
 }
 
-#daily-tasks-list .task-item .task-controls { /* Container for checkboxes/delete */
+#daily-tasks-list .task-item .task-controls {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -485,46 +532,26 @@ ul {
     margin-top: 0.5rem;
 }
 
-#daily-tasks-list .task-item .task-checkboxes { /* Group checkboxes */
+#daily-tasks-list .task-item .task-checkboxes {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
 
-#daily-tasks-list .task-item label { /* Checkbox labels */
+#daily-tasks-list .task-item label { /* Task checkbox labels */
      font-size: 0.9em;
      color: var(--subtle);
-     display: inline-flex; /* align checkbox and text */
+     display: inline-flex;
      align-items: center;
      gap: 0.4rem;
      cursor: pointer;
-     margin: 0; /* Reset margin */
+     margin: 0;
 }
 
-#daily-tasks-list .task-item button.delete-task-btn {
-     background: none;
-     border: none;
-     color: var(--red);
-     padding: 0.3rem 0.5rem;
-     font-size: 1.2em; /* Make 'x' slightly larger */
-     line-height: 1;
-     border-radius: var(--border-radius-sm);
-     margin-left: auto; /* Pushes to the right if space allows */
-     cursor: pointer;
-}
-#daily-tasks-list .task-item button.delete-task-btn:hover {
-      background-color: rgba(237, 135, 150, 0.1); /* Red subtle hover */
-      color: var(--red-hover);
-}
-
-
+/* Add Task Form */
 #add-daily-task-form {
     margin-top: 2rem;
-    padding: 1.5rem;
-    border-top: none;
-    background-color: var(--mantle);
-    border: 1px solid var(--surface0);
-    border-radius: var(--border-radius-lg);
+    border-top: none; /* Remove potential double border */
 }
 #add-daily-task-form h4 {
     margin-top: 0;
@@ -532,19 +559,14 @@ ul {
     color: var(--subtle);
     font-weight: 500;
 }
-#add-daily-task-form div {
-    margin-bottom: 1rem;
-}
 #add-daily-task-form textarea {
-     min-height: 80px;
-     display: block;
-     margin-bottom: 0;
+     margin-bottom: 0; /* Override default div margin if needed */
 }
 #add-daily-task-form button[type="submit"] {
      margin-top: 1rem;
 }
 
-
+/* Daily Log Footer */
 .daily-log-footer {
     display: flex;
     justify-content: space-between;
@@ -568,7 +590,10 @@ ul {
     margin-left: 0.5rem;
 }
 
-/* Stats Page Specific Styles */
+/* ============================== */
+/* ==      STATS PAGE          == */
+/* ============================== */
+
 .streak-display h3 {
     text-align: center;
     font-size: 1.3em;
@@ -579,40 +604,142 @@ ul {
     color: var(--green); /* Green for streak */
     font-weight: 600;
 }
+
+/* Date Range Selector */
+#stats-range-selector {
+    background-color: var(--mantle);
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--surface0);
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.stats-range-presets {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.stats-range-presets span {
+    color: var(--subtle);
+    font-size: 0.9em;
+    margin-right: 0.5rem;
+    font-weight: 500;
+}
+
+.stats-range-presets button { /* Range preset buttons */
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85em;
+    background-color: var(--surface1);
+    color: var(--text);
+    margin-top: 0;
+}
+.stats-range-presets button:hover {
+    background-color: var(--surface2);
+}
+.stats-range-presets button.active {
+    background-color: var(--mauve);
+    color: var(--crust);
+    font-weight: 600;
+}
+.stats-range-presets button[data-range="custom-toggle"].active {
+    background-color: var(--blue); /* Specific color for active custom toggle */
+}
+
+.stats-range-custom { /* Custom date input area */
+    display: flex; /* Toggled by JS ('flex' or 'none') */
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.8rem 1.5rem;
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--surface0);
+}
+
+.stats-range-custom label {
+    margin-bottom: 0;
+    font-size: 0.9em;
+    color: var(--subtle);
+}
+
+.stats-range-custom input[type="date"] {
+    padding: 0.4rem 0.8rem;
+    width: auto;
+    min-width: 140px;
+    font-size: 0.9em;
+    background-color: var(--base);
+}
+
+#stats-apply-custom-range { /* Apply button */
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85em;
+    background-color: var(--blue);
+    color: var(--crust);
+    margin-top: 0;
+    margin-left: auto; /* Push apply button to right if space */
+}
+#stats-apply-custom-range:hover {
+    background-color: var(--blue-hover);
+}
+
+hr.stats-divider { /* Optional divider */
+    margin: 1.5rem 0 2rem 0;
+}
+
+/* Chart Containers */
+.chart-container {
+    position: relative;
+    height: 350px;
+    width: 100%;
+    max-width: 850px;
+    margin: 2em auto;
+    background-color: var(--mantle);
+    padding: 1rem 2rem 1.5rem 1.5rem;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--surface0);
+}
+#stats-page .chart-container {
+    margin-bottom: 2.5rem;
+}
+.chart-container h3 { /* Chart titles */
+    color: var(--subtle);
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+canvas {
+    display: block;
+    max-width: 100%;
+}
+
+
+/* Habit Stats Specific Container */
 .habit-stats-container {
     margin-top: 2rem;
 }
-/* Target the div containing title/label/select for habit stats */
-.habit-stats-container > div:first-of-type {
+.habit-stats-container > div:first-of-type { /* Selector/Title container */
     display: flex;
-    flex-direction: column; /* Stack title above select */
-    align-items: center;    /* Center items horizontally */
+    flex-direction: column;
+    align-items: center;
     gap: 0.8rem;
     margin-bottom: 1.5rem;
 }
-.habit-stats-container > div:first-of-type h3 {
-    margin: 0; /* Remove margins */
-    text-align: center; /* Center title */
-    margin-bottom: 0.5rem; /* Space below title */
-}
-/* Container for label and select to keep them inline */
-.habit-select-control {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-}
-
-.habit-stats-container label {
+.habit-stats-container label { /* For habit selector */
      margin: 0;
 }
-.habit-stats-container select {
+.habit-stats-container select#habit-stats-selector { /* Habit dropdown */
      display: inline-block;
      width: auto;
      min-width: 250px;
      margin-bottom: 0;
 }
-
-.habit-stats-container p {
+.habit-stats-container p { /* Habit streak display */
     text-align: center;
     margin-top: 1rem;
     font-size: 1.1em;
@@ -623,126 +750,71 @@ ul {
     color: var(--text);
 }
 
-/* Chart Container Styles */
-.chart-container {
-    position: relative;
-    height: 350px;
-    width: 100%;
-    max-width: 850px;
-    margin: 2em auto;
-    background-color: var(--mantle);
-    padding: 1rem 2rem 1.5rem 1.5rem; /* LTRB padding */
-    border-radius: var(--border-radius-lg);
-    border: 1px solid var(--surface0);
-}
-canvas {
-    display: block;
-    max-width: 100%;
-}
-#stats-page .chart-container {
-    margin-bottom: 2.5rem;
-}
-.chart-container h3 { /* Style chart titles */
-    color: var(--subtle);
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 1.5rem;
-    font-size: 1.1rem;
-    font-weight: 500;
+/* ============================== */
+/* ==    EDIT HABITS PAGE      == */
+/* ============================== */
+
+#add-habit-form {
+    /* Uses base form styles */
 }
 
-/* === Stats Page Range Selector Styles === */
-#stats-range-selector {
-    background-color: var(--mantle);
-    padding: 1rem 1.5rem;
-    border-radius: var(--border-radius-lg);
-    border: 1px solid var(--surface0);
-    margin-bottom: 1.5rem;
-    display: flex;
-    flex-direction: column; /* Stack presets and custom */
-    gap: 1rem;
+#habits-list {
+    /* Uses base ul styles */
 }
-
-.stats-range-presets {
+#habits-list li {
+    background: var(--mantle);
+    border: 1px solid var(--surface0);
+    margin-bottom: 0.8rem;
+    padding: 1rem 1.2rem;
     display: flex;
-    flex-wrap: wrap; /* Allow buttons to wrap */
+    justify-content: space-between;
     align-items: center;
-    gap: 0.6rem; /* Space between items */
-}
-
-.stats-range-presets span {
-    color: var(--subtle);
-    font-size: 0.9em;
-    margin-right: 0.5rem;
-    font-weight: 500;
-}
-
-.stats-range-presets button {
-    padding: 0.4rem 0.9rem; /* Slightly smaller padding */
-    font-size: 0.85em;
-    background-color: var(--surface1);
-    color: var(--text);
-    margin-top: 0; /* Override default button margin */
-}
-.stats-range-presets button:hover {
-    background-color: var(--surface2);
-}
-.stats-range-presets button.active {
-    background-color: var(--mauve);
-    color: var(--crust);
-    font-weight: 600;
-}
-/* Specific style for custom toggle button when active */
-.stats-range-presets button[data-range="custom-toggle"].active {
-    background-color: var(--blue);
-}
-
-
-.stats-range-custom {
-    display: flex; /* Use flex for layout, will be toggled by JS */
+    border-radius: var(--border-radius-lg);
     flex-wrap: wrap;
-    align-items: center;
-    gap: 0.8rem 1.5rem; /* Row gap, Column gap */
-    padding-top: 1rem;
-    margin-top: 0.5rem; /* Space above separator */
-    border-top: 1px solid var(--surface0); /* Separator */
+    gap: 0.8rem;
 }
 
-.stats-range-custom label {
-    margin-bottom: 0; /* Override default label margin */
+#habits-list li span:first-child { /* Habit info span */
+    flex-grow: 1;
+    margin-right: 1rem;
+    line-height: 1.4;
+}
+#habits-list li span strong { /* Habit name */
+    color: var(--text);
+    font-weight: 500;
+}
+#habits-list li span .habit-meta { /* Weight/Status */
     font-size: 0.9em;
     color: var(--subtle);
+    margin-left: 0.5rem; /* Space after name */
 }
 
-.stats-range-custom input[type="date"] {
-    padding: 0.4rem 0.8rem;
-    width: auto; /* Allow input to size naturally */
-    min-width: 140px;
+#habits-list li span small { /* Habit description */
+    color: var(--subtle);
+    display: block;
+    margin-top: 0.2rem;
     font-size: 0.9em;
-    background-color: var(--base); /* Different bg for inputs */
-    /* color-scheme: dark; Already applied globally */
 }
 
-#stats-apply-custom-range {
-    padding: 0.4rem 0.9rem;
-    font-size: 0.85em;
-    background-color: var(--blue); /* Blue for apply */
-    color: var(--crust);
-    margin-top: 0;
-    margin-left: auto; /* Push apply button to right if space */
-}
-#stats-apply-custom-range:hover {
-    background-color: var(--blue-hover);
+#habits-list li .controls { /* Container for buttons */
+    /* Uses button styles defined earlier for buttons inside */
+    flex-shrink: 0; /* Prevent controls shrinking too much */
 }
 
-/* Optional divider below selector */
-hr.stats-divider {
-    margin: 1.5rem 0 2rem 0; /* Adjust spacing */
+#habits-list li.habit-inactive {
+    opacity: 0.7; /* Visually dim inactive habits */
+}
+#habits-list li.habit-inactive strong {
+    /* Maybe slightly different color? */
+     /* color: var(--overlay); */
 }
 
 
-/* Data Management Styles */
-.data-action {
+/* ============================== */
+/* ==  DATA MANAGEMENT PAGE    == */
+/* ============================== */
+
+.data-action { /* Wrapper for export/import/delete sections */
     margin-bottom: 2rem;
     padding: 1.5rem;
     background-color: var(--mantle);
@@ -774,31 +846,22 @@ hr.stats-divider {
     font-size: 0.9rem;
     font-weight: 500;
     margin-right: 1rem;
-    transition: background-color var(--transition-speed) ease;
+    /* transition added globally */
 }
 .data-action input[type="file"]::file-selector-button:hover {
     background: var(--surface2);
 }
-
-
-/* Footer */
-footer {
-    text-align: center;
-    margin-top: 3rem;
-    padding: 1.5rem;
-    color: var(--subtle);
-    font-size: 0.9em;
-    border-top: 1px solid var(--surface0);
+.data-action h3[style*="color: red"],
+.data-action strong[style*="color: red"] { /* Style elements explicitly colored red */
+    color: var(--red) !important; /* Use variable, important to override inline */
+}
+.data-action strong[style*="color: orange"] {
+    color: var(--peach) !important; /* Use a theme color like peach */
 }
 
-/* Utility */
-small {
-    color: var(--subtle);
-    font-size: 0.9em;
-}
-
-
-/* === Kanban Board Styles === */
+/* ============================== */
+/* ==     KANBAN BOARD         == */
+/* ============================== */
 
 #kanban-page h2 {
     text-align: center;
@@ -824,7 +887,7 @@ small {
     min-height: 200px;
 }
 
-.kanban-column h2 {
+.kanban-column h2 { /* Column titles */
     font-size: 1.1rem;
     margin: 0 0 1rem 0;
     padding-bottom: 0.8rem;
@@ -834,7 +897,7 @@ small {
     font-weight: 500;
 }
 
-.kanban-cards {
+.kanban-cards { /* Area containing cards */
     min-height: 100px;
     padding: 0.2rem;
     border-radius: var(--border-radius-md);
@@ -864,44 +927,20 @@ small {
     cursor: grabbing;
 }
 
-.kanban-card h4 {
+.kanban-card h4 { /* Card title */
     margin: 0 0 0.5rem 0;
     font-size: 1rem;
     font-weight: 500;
     color: var(--text);
 }
 
-.kanban-card p {
+.kanban-card p { /* Card description */
     font-size: 0.9em;
     color: var(--subtle);
     margin: 0;
     white-space: pre-wrap;
     word-wrap: break-word;
 }
-
-.kanban-card .delete-goal-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: none;
-    border: none;
-    color: var(--subtle);
-    cursor: pointer;
-    font-size: 1.2rem;
-    padding: 2px 5px;
-    line-height: 1;
-    border-radius: var(--border-radius-sm);
-    opacity: 0.7;
-}
-.kanban-card:hover .delete-goal-btn {
-    opacity: 1;
-    color: var(--red);
-}
-.kanban-card .delete-goal-btn:hover {
-     background-color: rgba(237, 135, 150, 0.1);
-     color: var(--red-hover);
-}
-
 
 /* Drag and Drop Styling */
 .kanban-card.dragging {
@@ -911,32 +950,38 @@ small {
 }
 
 .kanban-cards.drag-over {
-    background-color: rgba(198, 160, 246, 0.1);
+    background-color: rgba(198, 160, 246, 0.1); /* mauve subtle bg */
     border: 2px dashed var(--mauve);
 }
 
+/* ============================== */
+/* ==     MODAL STYLES         == */
+/* (Used by Add Goal & Edit Habit) */
+/* ============================== */
 
-/* === Modal Styles === */
 .modal-overlay {
     position: fixed;
-    inset: 0;
-    background-color: rgba(17, 17, 21, 0.7);
+    inset: 0; /* shorthand for top/left/right/bottom = 0 */
+    background-color: var(--overlay-bg);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
-    transition: opacity var(--transition-speed) ease, visibility 0s linear var(--transition-speed);
+    /* Transition applied globally */
+    /* Explicitly define transition for opacity/visibility */
+    transition-property: opacity, visibility;
+    transition-duration: var(--transition-speed);
+    transition-timing-function: ease;
 }
-.modal-overlay.visible {
+.modal-overlay.visible { /* Class added by JS to show */
     opacity: 1;
     visibility: visible;
-    transition: opacity var(--transition-speed) ease;
 }
 
 .modal-content {
-    background-color: var(--surface0);
+    background-color: var(--surface0); /* Slightly lighter than base */
     padding: 2rem;
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--surface1);
@@ -945,44 +990,59 @@ small {
     position: relative;
     transform: scale(0.95);
     opacity: 0;
-    transition: transform var(--transition-speed) ease-out, opacity var(--transition-speed) ease-out;
+     /* Transition applied globally */
+     /* Explicitly define transition for transform/opacity */
+    transition-property: transform, opacity;
+    transition-duration: var(--transition-speed);
+    transition-timing-function: ease-out;
 }
-.modal-overlay.visible .modal-content {
+.modal-overlay.visible .modal-content { /* Animate in when overlay is visible */
     transform: scale(1);
     opacity: 1;
 }
 
-.modal-content h3#modal-title {
+.modal-content h3 { /* Modal Title */
     margin-top: 0;
     margin-bottom: 1.5rem;
     text-align: center;
     font-weight: 500;
     color: var(--text);
     font-size: 1.3rem;
+    padding-bottom: 1rem; /* Add padding below title */
+    border-bottom: 1px solid var(--surface1); /* Separator below title */
 }
 
-#modal-goal-form div {
+/* Styles for FORMS INSIDE modal content */
+.modal-content form {
+    margin-bottom: 0; /* Remove default form margin */
+    padding: 0; /* Remove default form padding */
+    background-color: transparent; /* Inherit modal background */
+    border: none; /* Remove default form border */
+}
+.modal-content form div { /* Spacing for form elements */
     margin-bottom: 1.2rem;
 }
-#modal-goal-form label {
+.modal-content form label {
     color: var(--subtle);
     font-size: 0.9rem;
 }
-#modal-goal-form input[type="text"],
-#modal-goal-form textarea {
-    background-color: var(--base);
+/* Inputs within modal */
+.modal-content form input[type="text"],
+.modal-content form input[type="number"], /* Added number */
+.modal-content form textarea {
+    background-color: var(--base); /* Darker input background */
     border-color: var(--surface1);
 }
-#modal-goal-form input:focus,
-#modal-goal-form textarea:focus {
-    border-color: var(--mauve);
-    box-shadow: 0 0 0 2px var(--focus-ring-color);
+.modal-content form input:focus,
+.modal-content form textarea:focus {
+    /* Uses base focus styles */
 }
-#modal-goal-form textarea {
+.modal-content form textarea {
      min-height: 100px;
      resize: vertical;
 }
 
+/* Modal Actions (Buttons container) */
 .modal-actions {
     display: flex;
     justify-content: flex-end;
@@ -991,29 +1051,27 @@ small {
     padding-top: 1.5rem;
     border-top: 1px solid var(--surface1);
 }
+.modal-actions button {
+    margin-top: 0; /* Remove default button margin */
+}
 
-#cancel-goal-button {
+/* Example: Style specific modal buttons if needed */
+/* Ensure Save button uses theme color */
+.modal-actions button[type="submit"] {
+    background-color: var(--green); /* Use green for primary save */
+    color: var(--crust);
+}
+.modal-actions button[type="submit"]:hover {
+    background-color: #c6a0f6; /* Lighter green */
+}
+/* Style Cancel button */
+.modal-actions button[type="button"] { /* Target cancel/close buttons */
     background-color: var(--surface1);
     color: var(--text);
 }
-#cancel-goal-button:hover {
+.modal-actions button[type="button"]:hover {
     background-color: var(--surface2);
 }
 
-.modal-close-btn {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: none;
-    border: none;
-    font-size: 1.6rem;
-    line-height: 1;
-    color: var(--subtle);
-    cursor: pointer;
-    padding: 0.3rem;
-    border-radius: 50%;
-}
-.modal-close-btn:hover {
-    color: var(--text);
-    background-color: var(--surface1);
-}
+/* Modal Close Button (Top Right 'X') */
+/* Uses .modal-close-btn styles defined in Buttons section */
